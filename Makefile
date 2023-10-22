@@ -23,7 +23,7 @@ build:
 	echo "Build finished!"
 
 run: build
-	${BIN_FILE}
+	${BIN_FILE} --config_file_path "./configs/config.yaml"
 
 test:
 	go test ./... -cover -coverprofile=coverage.out -v
