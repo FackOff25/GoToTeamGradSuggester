@@ -8,4 +8,4 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "8001:80"
-    command: /suggest/suggest --config_file_path /suggest/config.toml
+    command: /suggest/suggest --config_file_path /suggest/config.yaml
