@@ -163,7 +163,7 @@ jobs:
       - name: Connect and starting app
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.DEV_HOST }}
+          host: ${{ secrets.PROD_HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SHH_PRIVATE_KEY }}
           script: |
