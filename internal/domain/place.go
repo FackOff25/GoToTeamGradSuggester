@@ -4,6 +4,12 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	TypePlacePark = "park"
+	TypePlaceCafe = "cafe"
+	TypePlaceMuseum = "museum"
+)
+
 type ApiLocation struct {
 	Lat float64 `json:"lat,omitempty"`
 	Lng float64 `json:"lng,omitempty"`
@@ -27,3 +33,5 @@ type Place struct {
 	Rating    float32
 	RateCount int
 }
+
+

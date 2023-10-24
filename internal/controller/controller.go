@@ -14,7 +14,7 @@ type Controller struct {
 func (pc *Controller) Get(c echo.Context) error {
 	defer c.Request().Body.Close()
 
-	user, _ := pc.Usecase.GetUserPlaces()
+	user, _ := pc.Usecase.GetUser()
 
 	return c.JSON(http.StatusOK, user)
 }

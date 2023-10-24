@@ -5,5 +5,5 @@ import (
 )
 
 type UsecaseInterface interface {
-	GetUserPlaces() (*domain.User, error)
+	GetUser() (*domain.User, error)
 }

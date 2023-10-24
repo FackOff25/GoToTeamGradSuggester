@@ -5,5 +5,5 @@ import (
 )
 
 type QueriesInterface interface {
-	GetUserPlaces() (*domain.User, error) 
+	GetUser() (*domain.User, error) 
 }
