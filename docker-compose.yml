@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  suggest:
+    container_name: suggest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8001:80"
+    command: /suggest/suggest --config_file_path /suggest/config.yaml

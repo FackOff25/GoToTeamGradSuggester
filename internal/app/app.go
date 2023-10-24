@@ -2,31 +2,31 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller/handler"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
-	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config/configReader"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	// "github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
+	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
 	"github.com/labstack/echo/v4"
 )
 
-func Run(configFilePath string) {
-	configReader := configReader.NewConfigReader(configFilePath)
-	
-	config, err := configReader.ParseConfig()
+func Run(configFilePath string) {	
+	cfg, err := config.GetConfig(configFilePath)
+
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error while reading config: %s", err)
 	}
 
-	e := echo.New()
+	serverAddress := cfg.ServerAddress + ":" + cfg.ServerPort
 
-	serverAddress := config.ServerAddress + ":" + config.ServerPort
-	fmt.Println(config)
+	e := echo.New()
 
 	if err := configureServer(e); err != nil {
 		log.Fatalf("error while configuring server: %s", err)
@@ -38,7 +38,6 @@ func Run(configFilePath string) {
 }
 
 func configureServer(e *echo.Echo) error {
-
 	ctx := context.Background()
 	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: pgxpool.Pool{}}, ctx)
 	uc := usecase.New(*repo, ctx)
