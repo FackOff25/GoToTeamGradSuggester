@@ -28,9 +28,11 @@ type ApiPlace struct {
 }
 
 type NearbyPlace struct {
+	Id       uuid.UUID   `json:"id,omitempty"`
 	PlaceId  string      `json:"place_id,omitempty"`
 	Name     string      `json:"name,omitempty"`
 	Location ApiLocation `json:"location,omitempty"`
+	Cover    string      `json:"cover,omitempty"`
 }
 
 type Place struct {
