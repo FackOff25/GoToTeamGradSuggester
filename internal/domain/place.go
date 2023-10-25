@@ -4,6 +4,12 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	TypePlacePark   = "park"
+	TypePlaceCafe   = "cafe"
+	TypePlaceMuseum = "museum"
+)
+
 type ApiLocation struct {
 	Lat float64 `json:"lat,omitempty"`
 	Lng float64 `json:"lng,omitempty"`
@@ -19,6 +25,14 @@ type ApiPlace struct {
 	PlaceId        string      `json:"place_id,omitempty"`
 	ApiRatingCount int         `json:"user_ratings_total,omitempty"`
 	// Types          []string  `json:"types,omitempty"`
+}
+
+type NearbyPlace struct {
+	Id       uuid.UUID   `json:"id,omitempty"`
+	PlaceId  string      `json:"place_id,omitempty"`
+	Name     string      `json:"name,omitempty"`
+	Location ApiLocation `json:"location,omitempty"`
+	Cover    string      `json:"cover,omitempty"`
 }
 
 type Place struct {
