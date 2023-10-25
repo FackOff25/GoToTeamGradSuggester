@@ -42,9 +42,9 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 
 	controller := controller.Controller{Usecase: uc, Cfg: config}
 
-	e.GET("/api/v1/suggset/get", controller.Get)
+	e.GET("/api/v1/suggest/get", controller.Get)
 
-	e.GET("/api/v1/suggset/nearby", controller.CreatePlacesListHandler)
+	e.GET("/api/v1/suggest/nearby", controller.CreatePlacesListHandler)
 
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 
