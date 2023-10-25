@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	TypePlacePark = "park"
-	TypePlaceCafe = "cafe"
+	TypePlacePark   = "park"
+	TypePlaceCafe   = "cafe"
 	TypePlaceMuseum = "museum"
 )
 
@@ -27,11 +27,15 @@ type ApiPlace struct {
 	// Types          []string  `json:"types,omitempty"`
 }
 
+type NearbyPlace struct {
+	PlaceId  string      `json:"place_id,omitempty"`
+	Name     string      `json:"name,omitempty"`
+	Location ApiLocation `json:"location,omitempty"`
+}
+
 type Place struct {
 	Id        uuid.UUID
 	PlaceId   string
 	Rating    float32
 	RateCount int
 }
-
-

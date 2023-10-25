@@ -3,11 +3,15 @@ module github.com/FackOff25/GoToTeamGradSuggester
 go 1.21.3
 
 require (
+	github.com/FackOff25/GoToTeamGradGoLibs v1.1.2
 	github.com/google/uuid v1.3.1
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/labstack/gommon v0.4.0
 	github.com/spf13/viper v1.17.0
+)
+
+require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

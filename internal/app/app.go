@@ -10,14 +10,12 @@ import (
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	// "github.com/jackc/pgx/v5/pgxpool"
-
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
 	"github.com/labstack/echo/v4"
 )
 
-func Run(configFilePath string) {	
+func Run(configFilePath string) {
 	cfg, err := config.GetConfig(configFilePath)
 
 	if err != nil {
@@ -28,7 +26,7 @@ func Run(configFilePath string) {
 
 	e := echo.New()
 
-	if err := configureServer(e); err != nil {
+	if err := configureServer(e, cfg); err != nil {
 		log.Fatalf("error while configuring server: %s", err)
 	}
 
@@ -37,16 +35,18 @@ func Run(configFilePath string) {
 	}
 }
 
-func configureServer(e *echo.Echo) error {
+func configureServer(e *echo.Echo, config *config.Config) error {
 	ctx := context.Background()
 	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: pgxpool.Pool{}}, ctx)
 	uc := usecase.New(*repo, ctx)
 
-	controller := controller.Controller{Usecase: uc}
+	controller := controller.Controller{Usecase: uc, Cfg: config}
 
-	e.GET("/api/v1/get", controller.Get)
+	e.GET("/api/v1/suggset/get", controller.Get)
 
-	e.GET("/api/v1/dummy", handler.CreateNotImplementedResponse)
+	e.GET("/api/v1/suggset/nearby", controller.CreatePlacesListHandler)
+
+	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 
 	return nil
 }
