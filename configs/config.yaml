@@ -7,4 +7,4 @@ logger:
   format: plain
   level: 6
   name: place
-  output: ./log/places.log
+  output: ./log/sugest.log
