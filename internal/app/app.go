@@ -2,13 +2,17 @@ package app
 
 import (
 	"context"
-	"log"
+	"io"
+	"os"
+	"path/filepath"
 
+	"github.com/FackOff25/GoToTeamGradGoLibs/logger"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller/handler"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/jackc/pgx/v5/pgxpool"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
@@ -17,6 +21,30 @@ import (
 
 func Run(configFilePath string) {
 	cfg, err := config.GetConfig(configFilePath)
+
+	configOutput := cfg.LogOutput
+	if err := os.MkdirAll(filepath.Dir(configOutput), 0770); err != nil {
+		panic(err)
+	}
+	logFile, err := os.OpenFile(configOutput, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+
+	if err != nil {
+		log.Fatalf("Error opening log file: %s", err)
+	}
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	logOutput := io.MultiWriter(os.Stdout, logFile)
+
+	logger.InitEx(logger.Options{
+		Name:      cfg.LogAppName,
+		LogLevel:  log.Level(cfg.LogLevel),
+		LogFormat: cfg.LogFormat,
+		Out:       logOutput,
+	})
 
 	if err != nil {
 		log.Fatalf("error while reading config: %s", err)
