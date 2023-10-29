@@ -34,7 +34,14 @@ func (uc *UseCase) GetNearbyPlaces(cfg *config.Config, location string, radius i
 		request += "&type=" + placeType
 	}
 
-	resp, err := http.Get(request)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", request, nil)
+	if err != nil {
+		return []googleApi.Place{}, errors.New("Error while creating request: " + err.Error())
+	}
+
+	req.Header.Set("Proxy-Header", "go-explore")
+	resp, err := client.Do(req)
 	if err != nil {
 		return []googleApi.Place{}, err
 	}
