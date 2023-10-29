@@ -10,4 +10,4 @@ services:
       - "8001:80"
     command: /suggest/suggest --config_file_path /suggest/config.yaml
     volumes:
-      - ./log:/suggest/log
+      - ../log/suggest:/suggest/log
