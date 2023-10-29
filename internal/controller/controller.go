@@ -63,7 +63,7 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	location := c.QueryParam("location")
 
-	radius := 1000
+	radius := 10000
 	var err error
 	if c.QueryParams().Has("radius") {
 		radius, err = strconv.Atoi(c.QueryParam("radius"))
