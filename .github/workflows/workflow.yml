@@ -65,17 +65,6 @@ jobs:
         with:
           name: build
 
-      - name: Transfer build files to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.DEV_HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SHH_PRIVATE_KEY }}
-          source: "build/*"
-          target: "/home/ubuntu/suggest"
-          rm: true
-          strip_components: 1
-
       - name: Connect and killing the app
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -87,6 +76,17 @@ jobs:
               cd /home/ubuntu/suggest
               sudo docker compose down
             fi
+
+      - name: Transfer build files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SHH_PRIVATE_KEY }}
+          source: "build/*"
+          target: "/home/ubuntu/suggest"
+          rm: true
+          strip_components: 1
 
       - name: Connect and starting app
         uses: appleboy/ssh-action@v0.1.6
@@ -126,17 +126,6 @@ jobs:
         with:
           name: build
 
-      - name: Transfer build files to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SHH_PRIVATE_KEY }}
-          source: "build/*"
-          target: "/home/ubuntu/suggest"
-          rm: true
-          strip_components: 1
-
       - name: Connect and killing the app
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -148,6 +137,17 @@ jobs:
               cd /home/ubuntu/suggest
               sudo docker compose down
             fi
+
+      - name: Transfer build files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SHH_PRIVATE_KEY }}
+          source: "build/*"
+          target: "/home/ubuntu/suggest"
+          rm: true
+          strip_components: 1
 
       - name: Change config to prod one
         uses: appleboy/ssh-action@v0.1.6
