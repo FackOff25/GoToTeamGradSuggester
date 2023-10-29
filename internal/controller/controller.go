@@ -3,7 +3,6 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type Controller struct {
@@ -55,8 +55,6 @@ func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlac
 func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	defer c.Request().Body.Close()
 
-	log.Printf("Got request")
-
 	if !c.QueryParams().Has("location") {
 		return echo.ErrBadRequest
 	}
@@ -68,7 +66,7 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	if c.QueryParams().Has("radius") {
 		radius, err = strconv.Atoi(c.QueryParam("radius"))
 		if err != nil {
-			log.Printf("Bad radius: %s", c.QueryParam("radius"))
+			log.Errorf("Bad radius: %s", c.QueryParam("radius"))
 			return echo.ErrBadRequest
 		}
 	}
