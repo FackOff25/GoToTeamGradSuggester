@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc *UseCase) GetNearbyPlaces(id uuid.UUID, location string) ([]domain.ApiPlace, error) {
+func (uc *UseCase) GetNearbyPlacesMock(id uuid.UUID, location string) ([]domain.ApiPlace, error) {
 	// Google Maps API call
 	// nearbyPlaces, err := something.GetNearbyPlaces(location)
 	nearbyPlaces := make([]domain.ApiPlace, 0)
