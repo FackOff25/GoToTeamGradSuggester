@@ -12,7 +12,6 @@ import (
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
@@ -31,24 +30,34 @@ func (pc *Controller) Get(c echo.Context) error {
 }
 
 func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlace, error) {
-	uuid, _ := uuid.NewUUID() //TODO: replace with actual uuid
-
 	location := domain.ApiLocation{
 		Lat: result.Geometry.Location.Lat,
 		Lng: result.Geometry.Location.Lng,
 	}
 
+	log.Infof("%#v", result)
+
 	var cover string
 	if len(result.Photos) > 0 {
 		reference := result.Photos[0].Reference
 		cover = pc.Cfg.PlacesApiHost + "place/photo?maxwidth=" + strconv.FormatInt(result.Photos[0].Width, 10) + "&photo_reference=" + reference
+		result.Photos = result.Photos[1:]
+	}
+
+	var photos []string
+	for _, photo := range result.Photos {
+		cover = pc.Cfg.PlacesApiHost + "place/photo?maxwidth=" + strconv.FormatInt(photo.Width, 10) + "&photo_reference=" + photo.Reference
+		result.Photos = result.Photos[1:]
 	}
 
 	return domain.NearbyPlace{
-		Id:       uuid,
-		Name:     result.Name,
-		Location: location,
-		Cover:    cover,
+		PlaceId:     result.PlaceId,
+		Name:        result.Name,
+		Location:    location,
+		Cover:       cover,
+		Photos:      photos,
+		Rating:      float32(result.Rating),
+		RatingCount: int(result.RatingCount),
 	}, nil
 }
 
