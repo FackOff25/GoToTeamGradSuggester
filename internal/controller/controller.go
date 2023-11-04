@@ -35,8 +35,6 @@ func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlac
 		Lng: result.Geometry.Location.Lng,
 	}
 
-	log.Infof("%#v", result)
-
 	var cover string
 	if len(result.Photos) > 0 {
 		reference := result.Photos[0].Reference
