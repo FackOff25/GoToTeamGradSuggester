@@ -45,7 +45,6 @@ func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlac
 	var photos []string
 	for _, photo := range result.Photos {
 		cover = pc.Cfg.PlacesApiHost + "place/photo?maxwidth=" + strconv.FormatInt(photo.Width, 10) + "&photo_reference=" + photo.Reference
-		result.Photos = result.Photos[1:]
 	}
 
 	return domain.NearbyPlace{
