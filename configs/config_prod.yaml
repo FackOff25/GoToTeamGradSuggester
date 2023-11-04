@@ -5,6 +5,6 @@ placesApi:
   host: http://go-explore.ru/proxy/maps/api/
 logger:
   format: plain
-  level: 6
+  level: 4
   name: place
   output: ./log/places.log
