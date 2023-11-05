@@ -6,5 +6,5 @@ placesApi:
 logger:
   format: plain
   level: 4
-  name: place
-  output: ./log/places.log
+  name: suggest
+  output: ./log/sugest.log
