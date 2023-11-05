@@ -2,16 +2,16 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller/handler"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
-	"github.com/jackc/pgx/v5/pgxpool"
-
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"	
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
+	"github.com/FackOff25/GoToTeamGradSuggester/pkg/postgres"
 	"github.com/labstack/echo/v4"
 )
 
@@ -37,16 +37,25 @@ func Run(configFilePath string) {
 
 func configureServer(e *echo.Echo, config *config.Config) error {
 	ctx := context.Background()
-	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: pgxpool.Pool{}}, ctx)
+	pg, err := postgres.New(fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s", config.DBuser, config.DBpassword, config.DBurl, config.DBport, config.DBname), ctx)
+	if err != nil {
+		return err
+	}
+	p, err := pg.Connect()
+	if err != nil {
+		return err
+	}
+	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: *p}, ctx)
 	uc := usecase.New(*repo, ctx)
 
-	controller := controller.Controller{Usecase: uc, Cfg: config}
+	c := controller.Controller{Uc: uc, Cfg: config}
 
-	e.GET("/api/v1/suggest/get", controller.Get)
-
-	e.GET("/api/v1/suggest/nearby", controller.CreatePlacesListHandler)
+	e.GET("/api/v1/suggest/nearby", c.CreatePlacesListHandler)
+	e.POST("/api/v1/user/", c.GetUser)
 
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
+
 
 	return nil
 }

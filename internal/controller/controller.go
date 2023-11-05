@@ -18,16 +18,36 @@ import (
 )
 
 type Controller struct {
-	Usecase usecase.UsecaseInterface
+	Uc usecase.UsecaseInterface
 	Cfg     *config.Config
 }
 
-func (pc *Controller) Get(c echo.Context) error {
+func (pc *Controller) GetUser(c echo.Context) error {
 	defer c.Request().Body.Close()
 
-	user, _ := pc.Usecase.GetUser()
+	type id struct {
+		Id string `json:"id,omitempty"`
+	}
 
-	return c.JSON(http.StatusOK, user)
+	var userId id
+
+	err := json.NewDecoder(c.Request().Body).Decode(&userId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, nil)
+	}
+
+
+	user, err := pc.Uc.GetUser(userId.Id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, nil)
+	}
+
+	b, err := json.Marshal(user)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, nil)
+	}
+
+	return c.JSONBlob(http.StatusOK, b)
 }
 
 func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlace, error) {
@@ -82,7 +102,7 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 			"park",
 		}
 	*/
-	places, _ := pc.Usecase.GetNearbyPlaces(pc.Cfg, location, radius, "park")
+	places, _ := pc.Uc.GetNearbyPlaces(pc.Cfg, location, radius, "park")
 
 	sort.Slice(places, func(i, j int) bool {
 		return queries.ComparePlaces(places[i], places[j])

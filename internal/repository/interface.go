@@ -5,5 +5,6 @@ import (
 )
 
 type QueriesInterface interface {
-	GetUser() (*domain.User, error) 
+	GetUser(id string) (*domain.User, error) 
+	AddUser(id string) error
 }

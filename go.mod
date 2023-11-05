@@ -11,6 +11,8 @@ require (
 	github.com/spf13/viper v1.17.0
 )
 
+require github.com/pkg/errors v0.9.1 // indirect
+
 require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

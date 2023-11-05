@@ -7,6 +7,6 @@ import (
 )
 
 type UsecaseInterface interface {
-	GetUser() (*domain.User, error)
+	GetUser(id string) (*domain.User, error)
 	GetNearbyPlaces(cfg *config.Config, location string, radius int, placeType string) ([]googleApi.Place, error)
 }
