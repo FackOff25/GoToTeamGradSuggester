@@ -4,12 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"sort"
 	"strconv"
 
-	"github.com/FackOff25/GoToTeamGradGoLibs/googleApi"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
 	"github.com/labstack/echo/v4"
@@ -29,35 +25,6 @@ func (pc *Controller) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
-func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlace, error) {
-	location := domain.ApiLocation{
-		Lat: result.Geometry.Location.Lat,
-		Lng: result.Geometry.Location.Lng,
-	}
-
-	var cover string
-	if len(result.Photos) > 0 {
-		reference := result.Photos[0].Reference
-		cover = pc.Cfg.PlacesApiHost + "place/photo?maxwidth=" + strconv.FormatInt(result.Photos[0].Width, 10) + "&photo_reference=" + reference
-		result.Photos = result.Photos[1:]
-	}
-
-	var photos []string
-	for _, photo := range result.Photos {
-		cover = pc.Cfg.PlacesApiHost + "place/photo?maxwidth=" + strconv.FormatInt(photo.Width, 10) + "&photo_reference=" + photo.Reference
-	}
-
-	return domain.NearbyPlace{
-		PlaceId:     result.PlaceId,
-		Name:        result.Name,
-		Location:    location,
-		Cover:       cover,
-		Photos:      photos,
-		Rating:      float32(result.Rating),
-		RatingCount: int(result.RatingCount),
-	}, nil
-}
-
 func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	defer c.Request().Body.Close()
 
@@ -67,7 +34,7 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	location := c.QueryParam("location")
 
-	radius := 10000
+	radius := 5000
 	var err error
 	if c.QueryParams().Has("radius") {
 		radius, err = strconv.Atoi(c.QueryParam("radius"))
@@ -76,33 +43,37 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 			return echo.ErrBadRequest
 		}
 	}
-	/*
-		types := []string{
-			"aquarium",
-			"art_gallery",
-			"cafe",
-			"church",
-			"museum",
-			"park",
+
+	limit := 20
+	if c.QueryParams().Has("limit") {
+		limit, err = strconv.Atoi(c.QueryParam("limit"))
+		if err != nil {
+			log.Errorf("Bad limit: %s", c.QueryParam("limit"))
+			return echo.ErrBadRequest
 		}
-	*/
-	places, _ := pc.Usecase.GetNearbyPlaces(pc.Cfg, location, radius, "park")
+	}
 
-	sort.Slice(places, func(i, j int) bool {
-		return queries.ComparePlaces(places[i], places[j])
-	})
+	offset := 0
+	if c.QueryParams().Has("offset") {
+		offset, err = strconv.Atoi(c.QueryParam("offset"))
+		if err != nil {
+			log.Errorf("Bad offset: %s", c.QueryParam("offset"))
+			return echo.ErrBadRequest
+		}
+	}
 
-	var result []domain.NearbyPlace
+	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, location, radius, limit, offset)
 
-	for _, v := range places {
-		place, _ := pc.formNearbyPlace(v)
-		result = append(result, place)
+	places = pc.Usecase.SortPlaces(places)[offset:]
+
+	if len(places) > limit {
+		places = places[:limit]
 	}
 
 	resBodyBytes := new(bytes.Buffer)
 	encoder := json.NewEncoder(resBodyBytes)
 	encoder.SetEscapeHTML(false)
-	encoder.Encode(result)
+	encoder.Encode(places)
 
 	return c.JSONBlob(http.StatusOK, resBodyBytes.Bytes())
 }

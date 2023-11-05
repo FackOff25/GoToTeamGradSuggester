@@ -15,6 +15,7 @@ type Config struct {
 	LogLevel      int
 	LogFormat     string
 	LogOutput     string
+	Categories    []string
 }
 
 func GetConfig(configPath string) (*Config, error) {
@@ -34,6 +35,7 @@ func GetConfig(configPath string) (*Config, error) {
 		LogLevel:      viper.GetInt("logger.level"),
 		LogFormat:     viper.GetString("logger.format"),
 		LogOutput:     viper.GetString("logger.output"),
+		Categories:    viper.GetStringSlice("categories"),
 	}
 
 	return &config, nil
