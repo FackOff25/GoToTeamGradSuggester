@@ -29,7 +29,7 @@ func New(r repository.Repo, ctx context.Context, cfg *config.Config) UsecaseInte
 }
 
 func comparePlaces(first, second domain.SuggestPlace) bool {
-	return first.SortValue < second.SortValue
+	return first.SortValue > second.SortValue
 }
 
 func isPlaceRight(place googleApi.Place) bool {
