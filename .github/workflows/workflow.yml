@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir ./build/configs
           cp ./configs/config.yaml ./build/configs/config.yaml
+          cp ./configs/config_prod.yaml ./build/configs/config_prod.yaml
           cp ./docker-compose.yml ./build
           cp ./Dockerfile ./build
 
@@ -99,7 +100,7 @@ jobs:
             chmod +x -R bin
             sudo docker compose up --build -d
 
-      - name: Connect and starting app
+      - name: Connect and (re)starting nginx
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.DEV_HOST }}
@@ -149,6 +150,15 @@ jobs:
               sudo docker compose down
             fi
 
+      - name: Change config to prod one
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SHH_PRIVATE_KEY }}
+          script: |
+            mv /home/ubuntu/suggest/configs/config_prod.yaml /home/ubuntu/suggest/configs/config.yaml
+
       - name: Connect and starting app
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -160,7 +170,7 @@ jobs:
             chmod +x -R bin
             sudo docker compose up --build -d
 
-      - name: Connect and starting app
+      - name: Connect and (re)starting nginx
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.PROD_HOST }}

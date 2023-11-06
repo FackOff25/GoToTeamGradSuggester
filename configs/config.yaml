@@ -3,6 +3,34 @@ server:
   port: "8000"
 placesApi:
   host: http://go-explore.online/proxy/maps/api/
+logger:
+  format: plain
+  level: 6
+  name: suggest
+  output: ./log/sugest.log
+categories:
+  - amusement_park
+  - aquarium
+  - art_gallery
+  - bar
+  - mosque
+  - movie_theater
+  - bowling_alley
+  - museum
+  - cafe
+  - night_club
+  - park
+  - casino
+  - cemetery
+  - church
+  - city_hall
+  - restaurant
+  - shopping_mall
+  - stadium
+  - synagogue
+  - tourist_attraction
+  - hindu_temple
+  - zoo
 db:
   url: ""
   port: ""

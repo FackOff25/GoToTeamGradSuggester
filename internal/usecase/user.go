@@ -1,26 +1,28 @@
 package usecase
 
 import (
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 )
 
-func (uc *UseCase) GetUser(id string) (*domain.User, error) {
-	dbUser, err := uc.repo.GetUser(id)
+func (uc *UseCase) AddUser(id string) error {
+	_, err := uc.repo.GetUser(id)
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			err := uc.repo.AddUser(id)
 			if err != nil {
-				return nil, err
+				return err
 			}
-			return &domain.User{Id: uuid.MustParse(id)}, nil
-
+			return nil
 		} else {
-			return nil, err
+			return err
 		}
 	}
 
-	return dbUser, nil
+	return nil
+}
+
+func (uc *UseCase) GetUser(id string) (*domain.User, error) {
+	return uc.repo.GetUser(id)
 }

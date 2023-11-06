@@ -3,18 +3,13 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
-	"sort"
 	"strconv"
 
-	"github.com/FackOff25/GoToTeamGradGoLibs/googleApi"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type Controller struct {
@@ -22,60 +17,31 @@ type Controller struct {
 	Cfg     *config.Config
 }
 
-func (pc *Controller) GetUser(c echo.Context) error {
+func (pc *Controller) Ping(c echo.Context) error {
 	defer c.Request().Body.Close()
-
-	type id struct {
-		Id string `json:"id,omitempty"`
-	}
-
-	var userId id
-
-	err := json.NewDecoder(c.Request().Body).Decode(&userId)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, nil)
-	}
-
-
-	user, err := pc.Uc.GetUser(userId.Id)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
-	}
-
-	b, err := json.Marshal(user)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
-	}
-
-	return c.JSONBlob(http.StatusOK, b)
+	return c.JSON(http.StatusOK, nil)
 }
 
-func (pc *Controller) formNearbyPlace(result googleApi.Place) (domain.NearbyPlace, error) {
-	uuid, _ := uuid.NewUUID() //TODO: replace with actual uuid
+func (pc *Controller) GetUser(c echo.Context) error {
+	defer c.Request().Body.Close()
+	return c.JSONBlob(http.StatusOK, []byte{})
+}
 
-	location := domain.ApiLocation{
-		Lat: result.Geometry.Location.Lat,
-		Lng: result.Geometry.Location.Lng,
+func (pc *Controller) AddUser(c echo.Context) error {
+	defer c.Request().Body.Close()
+
+	id := c.Request().Header.Get("X-UUID")
+
+	err := pc.Uc.AddUser(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, nil)
 	}
 
-	var cover string
-	if len(result.Photos) > 0 {
-		reference := result.Photos[0].Reference
-		cover = pc.Cfg.PlacesApiHost + "place/photo?maxwidth=" + strconv.FormatInt(result.Photos[0].Width, 10) + "&photo_reference=" + reference
-	}
-
-	return domain.NearbyPlace{
-		Id:       uuid,
-		Name:     result.Name,
-		Location: location,
-		Cover:    cover,
-	}, nil
+	return c.JSON(http.StatusOK, nil)
 }
 
 func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	defer c.Request().Body.Close()
-
-	log.Printf("Got request")
 
 	if !c.QueryParams().Has("location") {
 		return echo.ErrBadRequest
@@ -83,42 +49,46 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	location := c.QueryParam("location")
 
-	radius := 1000
+	radius := 5000
 	var err error
 	if c.QueryParams().Has("radius") {
 		radius, err = strconv.Atoi(c.QueryParam("radius"))
 		if err != nil {
-			log.Printf("Bad radius: %s", c.QueryParam("radius"))
+			log.Errorf("Bad radius: %s", c.QueryParam("radius"))
 			return echo.ErrBadRequest
 		}
 	}
-	/*
-		types := []string{
-			"aquarium",
-			"art_gallery",
-			"cafe",
-			"church",
-			"museum",
-			"park",
+
+	limit := 20
+	if c.QueryParams().Has("limit") {
+		limit, err = strconv.Atoi(c.QueryParam("limit"))
+		if err != nil {
+			log.Errorf("Bad limit: %s", c.QueryParam("limit"))
+			return echo.ErrBadRequest
 		}
-	*/
-	places, _ := pc.Uc.GetNearbyPlaces(pc.Cfg, location, radius, "park")
+	}
 
-	sort.Slice(places, func(i, j int) bool {
-		return queries.ComparePlaces(places[i], places[j])
-	})
+	offset := 0
+	if c.QueryParams().Has("offset") {
+		offset, err = strconv.Atoi(c.QueryParam("offset"))
+		if err != nil {
+			log.Errorf("Bad offset: %s", c.QueryParam("offset"))
+			return echo.ErrBadRequest
+		}
+	}
 
-	var result []domain.NearbyPlace
+	places, _ := pc.Uc.GetMergedNearbyPlaces(pc.Cfg, location, radius, limit, offset)
 
-	for _, v := range places {
-		place, _ := pc.formNearbyPlace(v)
-		result = append(result, place)
+	places = pc.Uc.SortPlaces(places)[offset:]
+
+	if len(places) > limit {
+		places = places[:limit]
 	}
 
 	resBodyBytes := new(bytes.Buffer)
 	encoder := json.NewEncoder(resBodyBytes)
 	encoder.SetEscapeHTML(false)
-	encoder.Encode(result)
+	encoder.Encode(places)
 
 	return c.JSONBlob(http.StatusOK, resBodyBytes.Bytes())
 }

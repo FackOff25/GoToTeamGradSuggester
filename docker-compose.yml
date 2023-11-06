@@ -9,3 +9,5 @@ services:
     ports:
       - "8001:80"
     command: /suggest/suggest --config_file_path /suggest/config.yaml
+    volumes:
+      - ../log/suggest:/suggest/log

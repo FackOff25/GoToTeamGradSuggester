@@ -27,17 +27,14 @@ type ApiPlace struct {
 	// Types          []string  `json:"types,omitempty"`
 }
 
-type NearbyPlace struct {
-	Id       uuid.UUID   `json:"id,omitempty"`
-	PlaceId  string      `json:"place_id,omitempty"`
-	Name     string      `json:"name,omitempty"`
-	Location ApiLocation `json:"location,omitempty"`
-	Cover    string      `json:"cover,omitempty"`
-}
-
-type Place struct {
-	Id        uuid.UUID
-	PlaceId   string
-	Rating    float32
-	RateCount int
+type SuggestPlace struct {
+	PlaceId     string      `json:"place_id,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	Location    ApiLocation `json:"location,omitempty"`
+	Cover       string      `json:"cover,omitempty"`
+	Photos      []string    `json:"photos,omitempty"`
+	Rating      float32     `json:"rating,omitempty"`
+	RatingCount int         `json:"rating_count,omitempty"`
+	Reaction    string      `json:"reactions,omitempty"`
+	SortValue   float32     `json:"-"`
 }
