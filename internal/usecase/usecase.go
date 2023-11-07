@@ -33,7 +33,7 @@ func comparePlaces(first, second domain.SuggestPlace) bool {
 }
 
 func isPlaceRight(place googleApi.Place) bool {
-	return place.RatingCount > 0
+	return place.RatingCount > 100 && place.Rating > 2.0
 }
 
 func formNearbyPlace(cfg *config.Config, result googleApi.Place) (domain.SuggestPlace, error) {
@@ -147,4 +147,16 @@ func (uc *UseCase) SortPlaces(places []domain.SuggestPlace) []domain.SuggestPlac
 		return comparePlaces(places[i], places[j])
 	})
 	return places
+}
+
+func (uc *UseCase) UniqPlaces(places []domain.SuggestPlace) []domain.SuggestPlace {
+	allKeys := make(map[string]bool)
+	list := []domain.SuggestPlace{}
+	for _, item := range places {
+		if _, value := allKeys[item.PlaceId]; !value {
+			allKeys[item.PlaceId] = true
+			list = append(list, item)
+		}
+	}
+	return list
 }

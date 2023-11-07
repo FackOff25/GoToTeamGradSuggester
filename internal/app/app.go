@@ -78,7 +78,7 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: *p}, ctx)
 	uc := usecase.New(*repo, ctx, config)
 
-	c := controller.Controller{Uc: uc, Cfg: config}
+	c := controller.Controller{Usecase: uc, Cfg: config}
 
 	e.GET("/api/v1/suggest/nearby", c.CreatePlacesListHandler)
 	e.POST("/api/v1/user/", c.GetUser)

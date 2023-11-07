@@ -13,7 +13,7 @@ import (
 )
 
 type Controller struct {
-	Uc usecase.UsecaseInterface
+	Usecase usecase.UsecaseInterface
 	Cfg     *config.Config
 }
 
@@ -32,7 +32,7 @@ func (pc *Controller) AddUser(c echo.Context) error {
 
 	id := c.Request().Header.Get("X-UUID")
 
-	err := pc.Uc.AddUser(id)
+	err := pc.Usecase.AddUser(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}
@@ -77,10 +77,13 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 		}
 	}
 
-	places, _ := pc.Uc.GetMergedNearbyPlaces(pc.Cfg, location, radius, limit, offset)
+	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, location, radius, limit, offset)
 
-	places = pc.Uc.SortPlaces(places)[offset:]
+	places = pc.Usecase.SortPlaces(places)
 
+	places = pc.Usecase.UniqPlaces(places)
+
+	places = places[offset:]
 	if len(places) > limit {
 		places = places[:limit]
 	}

@@ -12,4 +12,5 @@ type UsecaseInterface interface {
 	GetNearbyPlaces(cfg *config.Config, location string, radius int, placeType string, pageToken string) ([]googleApi.Place, string, error)
 	GetMergedNearbyPlaces(cfg *config.Config, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error)
 	SortPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
+	UniqPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
 }
