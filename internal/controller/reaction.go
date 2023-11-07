@@ -21,6 +21,12 @@ func (pc *Controller) CreateNewReactionHandler(c echo.Context) error {
 	if err != nil {
 		return echo.ErrBadRequest
 	}
+	if requestBody.PlaceId == "" ||
+		(requestBody.Reaction != "visited" &&
+			requestBody.Reaction != "like" &&
+			requestBody.Reaction != "refuse") {
+		return echo.ErrBadRequest
+	}
 
 	err = pc.Usecase.ApplyUserReactionToPlace(uuid[0], requestBody.PlaceId, requestBody.Reaction)
 	if err != nil {
