@@ -66,6 +66,8 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	places = pc.Usecase.SortPlaces(places)[offset:]
 
+	places = pc.Usecase.UniqPlaces(places)
+
 	if len(places) > limit {
 		places = places[:limit]
 	}
