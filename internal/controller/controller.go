@@ -64,10 +64,11 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, location, radius, limit, offset)
 
-	places = pc.Usecase.SortPlaces(places)[offset:]
+	places = pc.Usecase.SortPlaces(places)
 
 	places = pc.Usecase.UniqPlaces(places)
 
+	places = places[offset:]
 	if len(places) > limit {
 		places = places[:limit]
 	}
