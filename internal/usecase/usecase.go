@@ -36,7 +36,29 @@ func isPlaceRight(place googleApi.Place) bool {
 	return place.RatingCount > 100 && place.Rating > 2.0
 }
 
-func formNearbyPlace(cfg *config.Config, result googleApi.Place) (domain.SuggestPlace, error) {
+func calculateSortValue(user *domain.User, place googleApi.Place) float32 {
+	value := float32(0)
+	weights := getPlaceTypesWeight()
+
+	for _, placeType := range place.Types {
+		pref, ok := user.PlaceTypePreferences[placeType]
+		if !ok {
+			pref = 1
+		}
+
+		weight, ok := weights[placeType]
+		if !ok {
+			weight = 1
+		}
+
+		value += pref * weight
+	}
+
+	value += float32(place.Rating * ratingWeight)
+	return value
+}
+
+func formNearbyPlace(cfg *config.Config, user *domain.User, result googleApi.Place) (domain.SuggestPlace, error) {
 	location := domain.ApiLocation{
 		Lat: result.Geometry.Location.Lat,
 		Lng: result.Geometry.Location.Lng,
@@ -62,7 +84,7 @@ func formNearbyPlace(cfg *config.Config, result googleApi.Place) (domain.Suggest
 		Photos:      photos,
 		Rating:      float32(result.Rating),
 		RatingCount: int(result.RatingCount),
-		SortValue:   float32(result.Rating),
+		SortValue:   calculateSortValue(user, result),
 	}, nil
 }
 
@@ -106,7 +128,7 @@ func (uc *UseCase) GetNearbyPlaces(cfg *config.Config, location string, radius i
 	return result.Result, result.NextPageToken, nil
 }
 
-func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error) {
+func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error) {
 	waitGroup := new(sync.WaitGroup)
 	result := []googleApi.Place{}
 
@@ -125,15 +147,15 @@ func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, location string, ra
 	}
 	waitGroup.Wait()
 
-	return uc.proceedPlaces(cfg, result), nil
+	return uc.proceedPlaces(cfg, user, result), nil
 }
 
-func (uc *UseCase) proceedPlaces(cfg *config.Config, places []googleApi.Place) []domain.SuggestPlace {
+func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places []googleApi.Place) []domain.SuggestPlace {
 	//TODO: make it parallel
 	proceeded := []domain.SuggestPlace{}
 	for _, place := range places {
 		if isPlaceRight(place) {
-			proceededPlace, err := formNearbyPlace(uc.cfg, place)
+			proceededPlace, err := formNearbyPlace(uc.cfg, user, place)
 			if err == nil {
 				proceeded = append(proceeded, proceededPlace)
 			}
