@@ -76,6 +76,8 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 
 	e.GET("/api/v1/suggest/nearby", controller.CreatePlacesListHandler)
 
+	e.POST("/api/v1/suggest/reaction", handler.CreateNotImplementedResponse)
+
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 
 	return nil
