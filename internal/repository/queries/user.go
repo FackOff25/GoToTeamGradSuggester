@@ -1,7 +1,6 @@
 package queries
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
