@@ -5,3 +5,8 @@ type User struct {
 	Username string `json:"username,omitempty"`
 	PlaceTypePreferences map[string]float64 `json:"preferences,omitempty"`
 }
+
+type NewReactionRequest struct {
+	PlaceId  string `json:"place_id"`
+	Reaction string `json:"reaction"`
+}

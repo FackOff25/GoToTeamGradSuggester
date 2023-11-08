@@ -84,6 +84,8 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 	e.GET("/api/v1/user/", c.GetUser)
 	e.POST("/api/v1/user/new", c.AddUser)
 
+	e.POST("/api/v1/suggest/reaction", c.CreateNewReactionHandler)
+
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 	e.GET("/api/v1/suggest/ping", c.Ping)
 

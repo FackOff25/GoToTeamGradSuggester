@@ -23,6 +23,10 @@ func (uc *UseCase) AddUser(id string) error {
 	return nil
 }
 
-func (uc *UseCase) GetUser(id string, ) (*domain.User, error) {
-	return uc.repo.GetUser(id)
+func (uc *UseCase) GetUser(uuid string) (*domain.User, error) {
+	return uc.repo.GetUser(uuid)
+}
+
+func (uc *UseCase) ApplyUserReactionToPlace(uuid string, placeId string, reaction string) error {
+	return nil
 }

@@ -144,12 +144,6 @@ func (q *Queries) GetUser(id string) (*domain.User, error) {
 		return nil, err
 	}
 
-	fmt.Println(user.PlaceTypePreferences)
-
-	if err != nil {
-		return nil, err
-	}
-
 	return &user, nil
 }
 

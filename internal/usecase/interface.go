@@ -7,10 +7,11 @@ import (
 )
 
 type UsecaseInterface interface {
-	GetUser(id string) (*domain.User, error)
 	AddUser(id string) error
+	GetUser(uuid string) (*domain.User, error)
+	ApplyUserReactionToPlace(uuid string, placeId string, reaction string) error
 	GetNearbyPlaces(cfg *config.Config, location string, radius int, placeType string, pageToken string) ([]googleApi.Place, string, error)
-	GetMergedNearbyPlaces(cfg *config.Config, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error)
+	GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error)
 	SortPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
 	UniqPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
 }

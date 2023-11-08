@@ -15,6 +15,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const uuidHeader = "X-Uuid"
+
 type Controller struct {
 	Usecase usecase.UsecaseInterface
 	Cfg     *config.Config
@@ -71,6 +73,16 @@ func (pc *Controller) AddUser(c echo.Context) error {
 func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	defer c.Request().Body.Close()
 
+	uuid, ok := c.Request().Header[uuidHeader]
+	if !ok {
+		return echo.ErrUnauthorized
+	}
+
+	user, err := pc.Usecase.GetUser(uuid[0])
+	if err != nil {
+		return echo.ErrUnauthorized
+	}
+
 	if !c.QueryParams().Has("location") {
 		return echo.ErrBadRequest
 	}
@@ -78,7 +90,6 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	location := c.QueryParam("location")
 
 	radius := 5000
-	var err error
 	if c.QueryParams().Has("radius") {
 		radius, err = strconv.Atoi(c.QueryParam("radius"))
 		if err != nil {
@@ -105,11 +116,11 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 		}
 	}
 
-	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, location, radius, limit, offset)
-
-	places = pc.Usecase.SortPlaces(places)
+	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset)
 
 	places = pc.Usecase.UniqPlaces(places)
+
+	places = pc.Usecase.SortPlaces(places)
 
 	places = places[offset:]
 	if len(places) > limit {

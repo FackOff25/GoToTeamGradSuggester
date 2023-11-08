@@ -18,7 +18,7 @@ type ApiLocation struct {
 type ApiPlace struct {
 	Id             uuid.UUID   `json:"id,omitempty"`
 	Cover          string      `json:"cover,omitempty"`
-	Rating         float32     `json:"rating,omitempty"`
+	Rating         float64     `json:"rating,omitempty"`
 	RatingCount    int         `json:"rating_count,omitempty"`
 	Name           string      `json:"name,omitempty"`
 	Location       ApiLocation `json:"location,omitempty"`
@@ -33,8 +33,8 @@ type SuggestPlace struct {
 	Location    ApiLocation `json:"location,omitempty"`
 	Cover       string      `json:"cover,omitempty"`
 	Photos      []string    `json:"photos,omitempty"`
-	Rating      float32     `json:"rating,omitempty"`
+	Rating      float64     `json:"rating,omitempty"`
 	RatingCount int         `json:"rating_count,omitempty"`
 	Reaction    string      `json:"reactions,omitempty"`
-	SortValue   float32     `json:"-"`
+	SortValue   float64     `json:"-"`
 }
