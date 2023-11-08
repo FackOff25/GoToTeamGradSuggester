@@ -46,6 +46,8 @@ func Run(configFilePath string) {
 		Out:       logOutput,
 	})
 
+	log.Infof("%s", cfg.LogFormat)
+
 	if err != nil {
 		log.Fatalf("error while reading config: %s", err)
 	}
@@ -66,13 +68,15 @@ func Run(configFilePath string) {
 func configureServer(e *echo.Echo, config *config.Config) error {
 	ctx := context.Background()
 	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: pgxpool.Pool{}}, ctx)
-	uc := usecase.New(*repo, ctx)
+	uc := usecase.New(*repo, ctx, config)
 
 	controller := controller.Controller{Usecase: uc, Cfg: config}
 
 	e.GET("/api/v1/suggest/get", controller.Get)
 
 	e.GET("/api/v1/suggest/nearby", controller.CreatePlacesListHandler)
+
+	e.POST("/api/v1/suggest/reaction", controller.CreateNewReactionHandler)
 
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 
