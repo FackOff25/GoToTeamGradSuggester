@@ -81,7 +81,7 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 	c := controller.Controller{Usecase: uc, Cfg: config}
 
 	e.GET("/api/v1/suggest/nearby", c.CreatePlacesListHandler)
-	e.POST("/api/v1/user/", c.GetUser)
+	e.GET("/api/v1/user/", c.GetUser)
 	e.POST("/api/v1/user/new", c.AddUser)
 
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)

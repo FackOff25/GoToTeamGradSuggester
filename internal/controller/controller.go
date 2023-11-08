@@ -3,11 +3,14 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"html"
 	"net/http"
 	"strconv"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
@@ -24,17 +27,42 @@ func (pc *Controller) Ping(c echo.Context) error {
 
 func (pc *Controller) GetUser(c echo.Context) error {
 	defer c.Request().Body.Close()
-	return c.JSONBlob(http.StatusOK, []byte{})
+
+	id := html.EscapeString(c.Request().Header.Get("X-UUID"))
+	fmt.Println("id: ", id, id == "")
+
+	u, err := pc.Usecase.GetUser(id)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return echo.ErrNotFound
+		}
+		log.Errorf("Repo error: %s; id: %s", err.Error(), id)
+		return echo.ErrInternalServerError
+	}
+
+	u.PlaceTypePreferences = nil // на клиенте не нужны предпочтения
+	b, err := json.Marshal(u)
+	if err != nil {
+		log.Errorf("Marshal error: %s; id: %s", err.Error(), id)
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSONBlob(http.StatusOK, b)
 }
 
 func (pc *Controller) AddUser(c echo.Context) error {
 	defer c.Request().Body.Close()
 
-	id := c.Request().Header.Get("X-UUID")
+	id := html.EscapeString(c.Request().Header.Get("X-UUID"))
+
+	if id == "" {
+		return echo.ErrBadRequest
+	}
 
 	err := pc.Usecase.AddUser(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, nil)
+		log.Errorf("Repo error: %s; id: %s", err.Error(), id)
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, nil)

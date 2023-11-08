@@ -1,9 +1,7 @@
 package domain
 
-import "github.com/google/uuid"
-
 type User struct {
-	Id uuid.UUID
-	Username string
-	PlaceTypePreferences map[string]float32
+	Id string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+	PlaceTypePreferences map[string]float64 `json:"preferences,omitempty"`
 }
