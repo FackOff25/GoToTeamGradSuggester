@@ -6,16 +6,17 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
 	"github.com/FackOff25/GoToTeamGradGoLibs/logger"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller/handler"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
-	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"	
-	log "github.com/sirupsen/logrus"
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/postgres"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 func Run(configFilePath string) {
@@ -44,8 +45,6 @@ func Run(configFilePath string) {
 		LogFormat: cfg.LogFormat,
 		Out:       logOutput,
 	})
-
-	log.Infof("%s", cfg.LogFormat)
 
 	if err != nil {
 		log.Fatalf("error while reading config: %s", err)
@@ -88,7 +87,6 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 	e.GET("/api/v1/suggest/ping", c.Ping)
-
 
 	return nil
 }
