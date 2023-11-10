@@ -36,8 +36,8 @@ func isPlaceRight(place googleApi.Place) bool {
 	return place.RatingCount > 100 && place.Rating > 2.0
 }
 
-func calculateSortValue(user *domain.User, place googleApi.Place) float64 {
-	value := float64(0)
+func calculateSortValue(user *domain.User, place googleApi.Place) float32 {
+	value := float32(0)
 	weights := getPlaceTypesWeight()
 
 	for _, placeType := range place.Types {
@@ -54,7 +54,7 @@ func calculateSortValue(user *domain.User, place googleApi.Place) float64 {
 		value += pref * weight
 	}
 
-	value += float64(place.Rating * ratingWeight)
+	value += float32(place.Rating * ratingWeight)
 	return value
 }
 
@@ -82,7 +82,7 @@ func formNearbyPlace(cfg *config.Config, user *domain.User, result googleApi.Pla
 		Location:    location,
 		Cover:       cover,
 		Photos:      photos,
-		Rating:      float64(result.Rating),
+		Rating:      float32(result.Rating),
 		RatingCount: int(result.RatingCount),
 		SortValue:   calculateSortValue(user, result),
 	}, nil

@@ -5,9 +5,9 @@ const (
 )
 
 type User struct {
-	Id string `json:"id,omitempty"`
-	Username string `json:"username,omitempty"`
-	PlaceTypePreferences map[string]float64 `json:"preferences,omitempty"`
+	Id                   string             `json:"id,omitempty"`
+	Username             string             `json:"username,omitempty"`
+	PlaceTypePreferences map[string]float32 `json:"preferences,omitempty"`
 }
 
 type NewReactionRequest struct {

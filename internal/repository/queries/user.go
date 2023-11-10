@@ -42,7 +42,7 @@ func (q *Queries) GetUser(id string) (*domain.User, error) {
 }
 
 func (q *Queries) AddUser(id string, categories []string) error {
-	m := make(map[string]float64)
+	m := make(map[string]float32)
 
 	for _, v := range categories {
 		m[v] = 1.0
@@ -71,7 +71,7 @@ func (q *Queries) ApplyUserReactionToPlace(uuid string, placeId string, reaction
 		return err
 	}
 
-	var multiplier float64
+	var multiplier float32
 
 	switch reaction {
 	case domain.ReactionVisited:

@@ -16,9 +16,9 @@ type Queries struct {
 // 	return *Queries{ctx: ctx, Pool: pool}
 // }
 
-func UnmarshalUserRatings(s string) (map[string]float64, error) {
+func UnmarshalUserRatings(s string) (map[string]float32, error) {
 	jsonbytes := []byte(s)
-	m := make(map[string]float64)
+	m := make(map[string]float32)
 	err := json.Unmarshal(jsonbytes, &m)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func UnmarshalUserRatings(s string) (map[string]float64, error) {
 	return m, nil
 }
 
-func MarshalUserRatings(m map[string]float64) (string, error) {
+func MarshalUserRatings(m map[string]float32) (string, error) {
 	b, err := json.Marshal(m)
 	if err != nil {
 		return "", err

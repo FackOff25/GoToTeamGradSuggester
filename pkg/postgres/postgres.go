@@ -7,7 +7,7 @@ import (
 )
 
 type Postgres struct {
-	ctx context.Context
+	ctx    context.Context
 	config pgxpool.Config
 }
 
@@ -30,7 +30,6 @@ func (p *Postgres) Connect() (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
-	
 
 	return pool, nil
 }
