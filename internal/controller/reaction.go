@@ -3,9 +3,12 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 func (pc *Controller) CreateNewReactionHandler(c echo.Context) error {
@@ -22,14 +25,18 @@ func (pc *Controller) CreateNewReactionHandler(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 	if requestBody.PlaceId == "" ||
-		(requestBody.Reaction != "visited" &&
-			requestBody.Reaction != "like" &&
-			requestBody.Reaction != "refuse") {
+		(requestBody.Reaction != domain.ReactionVisited &&
+			requestBody.Reaction != domain.ReactionLike &&
+			requestBody.Reaction != domain.ReactionRefuse) {
 		return echo.ErrBadRequest
 	}
 
 	err = pc.Usecase.ApplyUserReactionToPlace(uuid[0], requestBody.PlaceId, requestBody.Reaction)
 	if err != nil {
+		if strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
+			return echo.ErrNotFound
+		}
+		log.Errorf("applying error: %s", err.Error())
 		return echo.ErrInternalServerError
 	}
 	return c.JSON(http.StatusOK, "OK")

@@ -3,11 +3,11 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html"
 	"net/http"
 	"strconv"
 
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
 	"github.com/jackc/pgx/v5"
@@ -31,7 +31,6 @@ func (pc *Controller) GetUser(c echo.Context) error {
 	defer c.Request().Body.Close()
 
 	id := html.EscapeString(c.Request().Header.Get("X-UUID"))
-	fmt.Println("id: ", id, id == "")
 
 	u, err := pc.Usecase.GetUser(id)
 	if err != nil {
@@ -63,6 +62,9 @@ func (pc *Controller) AddUser(c echo.Context) error {
 
 	err := pc.Usecase.AddUser(id)
 	if err != nil {
+		if err.Error() == domain.ErrorUserAlreadyExists {
+			return echo.ErrConflict
+		}
 		log.Errorf("Repo error: %s; id: %s", err.Error(), id)
 		return echo.ErrInternalServerError
 	}

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -10,11 +11,11 @@ import (
 )
 
 func (uc *UseCase) AddUser(id string) error {
-	_, err := uc.repo.GetUser(id)
+	u, err := uc.repo.GetUser(id)
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			err := uc.repo.AddUser(id)
+			err := uc.repo.AddUser(id, uc.cfg.Categories)
 			if err != nil {
 				return err
 			}
@@ -22,6 +23,10 @@ func (uc *UseCase) AddUser(id string) error {
 		} else {
 			return err
 		}
+	}
+
+	if u != nil {
+		return fmt.Errorf(domain.ErrorUserAlreadyExists)
 	}
 
 	return nil
@@ -32,8 +37,15 @@ func (uc *UseCase) GetUser(uuid string) (*domain.User, error) {
 }
 
 func (uc *UseCase) ApplyUserReactionToPlace(uuid string, placeId string, reaction string) error {
-	getPlaceTypes(placeId)
-	return nil
+	types := getPlaceTypes(placeId)
+
+	if len(types) == 0 {
+		return fmt.Errorf("no place types for place with id: %s", placeId)
+	}
+
+	err := uc.repo.ApplyUserReactionToPlace(uuid, placeId, reaction, types)
+
+	return err
 }
 
 //
