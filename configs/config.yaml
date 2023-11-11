@@ -4,7 +4,7 @@ server:
 placesApi:
   host: "@PROXY_URL@"
 routesApi:
-  host: "https://routes.googleapis.com/directions/v2:computeRoutes"
+  host: "@ROUTES_PROXY_URL@"
 logger:
   format: plain
   level: 6

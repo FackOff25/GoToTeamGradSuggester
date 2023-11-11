@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
@@ -11,13 +10,11 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"github.com/FackOff25/GoToTeamGradGoLibs/googleApi"
 )
 
 // first element is starting point, second is last (can be the same one)
 func sortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
-	return places
+	// return places
 	matrix := makeGraphMatrix(places)
 	path := gamilton.HungryAlgorythm(matrix)
 
@@ -54,7 +51,6 @@ func makeGraphMatrix(places []domain.ApiLocation) [][]float64 {
 	return matrix
 }
 
-
 func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 	if req.TravelMode == "" {
 		req.TravelMode = domain.TravelModeWalk
@@ -86,7 +82,7 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 		return nil, err
 	}
 
-	request := uc.cfg.RoutesApiHost + "directions/v2:computeRoutes"
+	request := uc.cfg.RoutesApiHost
 
 	client := &http.Client{}
 	Grequest, err := http.NewRequest(http.MethodPost, request, bytes.NewReader(BytesGreqBody))
@@ -108,7 +104,6 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 	}
 
 	clientResp := domain.Route{TravelMode: GreqBody.TravelMode, Polylines: make([]domain.Polyline, 0)}
-
 
 	for _, v := range result.Routes {
 		for _, val := range v.Legs {
