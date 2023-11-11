@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
@@ -94,17 +95,26 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 	}
 
 	Grequest.Header.Set("Proxy-Header", "go-explore")
-	resp, err := client.Do(Grequest)
+	gHttpResp, err := client.Do(Grequest)
 	if err != nil {
-		
+		return nil, err
 	}
 
-	data, _ := io.ReadAll(resp.Body)
-	var result googleApi.NearbyPlacesAnswer
-	json.Unmarshal(data, &result)
-
-	if result.Status != googleApi.STATUS_OK && result.Status != googleApi.STATUS_ZERO_RESULTS {
+	data, _ := io.ReadAll(gHttpResp.Body)
+	var result domain.GrouteResp
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, nil
+	clientResp := domain.Route{TravelMode: GreqBody.TravelMode, Polylines: make([]domain.Polyline, 0)}
+
+
+	for _, v := range result.Routes {
+		for _, val := range v.Legs {
+			clientResp.Polylines = append(clientResp.Polylines, domain.Polyline{PolylineString: val.Polyline})
+		}
+	}
+
+	return &clientResp, nil
 }
