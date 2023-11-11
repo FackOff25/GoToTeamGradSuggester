@@ -30,13 +30,13 @@ func (pc *Controller) GetRoute(c echo.Context) error {
 
 	resBody, err := pc.Usecase.GetRoute(&requestBody)
 	if err != nil {
-		log.Errorf("applying error: %s", err.Error())
+		log.Errorf("getting route error: %s", err.Error())
 		return echo.ErrInternalServerError
 	}
 
 	resBodyBytes, err := json.Marshal(resBody)
 	if err != nil {
-		log.Errorf("applying error: %s", err.Error())
+		log.Errorf("marshaling error: %s", err.Error())
 		return echo.ErrInternalServerError
 	}
 

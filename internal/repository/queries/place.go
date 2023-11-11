@@ -2,7 +2,6 @@ package queries
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 const (
@@ -13,7 +12,6 @@ const (
 
 func (q *Queries) AddPlace(gID string, types []string) (string, error) {
 	typesBytes, _ := json.Marshal(types)
-	fmt.Println(string(typesBytes))
 	typesString := string(typesBytes)
 	var id string
 	row := q.Pool.QueryRow(q.Ctx, addPlaceQuery, gID, typesString)

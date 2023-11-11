@@ -51,7 +51,7 @@ type GPlace struct {
 type GrouteRequest struct {
 	Origin        Gwaypoint   `json:"origin,omitempty"`
 	Destination   Gwaypoint   `json:"destination,omitempty"`
-	Intermediates []Gwaypoint `json:" ,omitempty"`
+	Intermediates []Gwaypoint `json:"intermediates,omitempty"`
 	TravelMode    string      `json:"travelMode,omitempty"`
 }
 
@@ -62,7 +62,7 @@ type GpolyLine struct {
 }
 
 type Gleg struct {
-	Polyline string `json:"polyline,omitempty"`
+	Polyline GpolyLine `json:"polyline,omitempty"`
 }
 
 type Groute struct {

@@ -14,7 +14,6 @@ import (
 
 // first element is starting point, second is last (can be the same one)
 func sortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
-	// return places
 	matrix := makeGraphMatrix(places)
 	path := gamilton.HungryAlgorythm(matrix)
 
@@ -57,6 +56,10 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 	}
 
 	unsortedPlaces := make([]domain.ApiLocation, 0)
+	unsortedPlaces = append(unsortedPlaces, req.Start)
+	unsortedPlaces = append(unsortedPlaces, req.End)
+
+
 	for _, v := range req.Waypoints {
 		unsortedPlaces = append(unsortedPlaces, v.Location)
 	}
@@ -77,6 +80,7 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 		}
 	}
 
+
 	BytesGreqBody, err := json.Marshal(GreqBody)
 	if err != nil {
 		return nil, err
@@ -91,6 +95,8 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 	}
 
 	Grequest.Header.Set("Proxy-Header", "go-explore")
+	Grequest.Header.Set("X-Goog-FieldMask", "routes.duration,routes.distanceMeters,routes.legs")
+
 	gHttpResp, err := client.Do(Grequest)
 	if err != nil {
 		return nil, err
@@ -107,7 +113,7 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 
 	for _, v := range result.Routes {
 		for _, val := range v.Legs {
-			clientResp.Polylines = append(clientResp.Polylines, domain.Polyline{PolylineString: val.Polyline})
+			clientResp.Polylines = append(clientResp.Polylines, domain.Polyline{PolylineString: val.Polyline.EncodedPolyline})
 		}
 	}
 
