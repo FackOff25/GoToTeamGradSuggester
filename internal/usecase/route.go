@@ -24,11 +24,11 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 
 	for i, v := range sortedPlaces {
 		if i == 0 {
-			Greq.Origin = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng{Lat: v.Lat, Lng: v.Lng}}}
+			Greq.Origin = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}}
 		} else if i == len(sortedPlaces)-1 {
-			Greq.Destination = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng{Lat: v.Lat, Lng: v.Lng}}}
+			Greq.Destination = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}}
 		} else {
-			Greq.Intermediates = append(Greq.Intermediates, domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng{Lat: v.Lat, Lng: v.Lng}}})
+			Greq.Intermediates = append(Greq.Intermediates, domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}})
 		}
 	}
 
