@@ -11,7 +11,6 @@ type Config struct {
 	ServerAddress string
 	ServerPort    string
 	PlacesApiHost string
-	RoutesApiHost string
 
 	DBurl      string
 	DBport     string
@@ -39,7 +38,6 @@ func GetConfig(configPath string) (*Config, error) {
 		ServerAddress: viper.GetString("server.address"),
 		ServerPort:    viper.GetString("server.port"),
 		PlacesApiHost: viper.GetString("placesApi.host"),
-		RoutesApiHost: viper.GetString("routesApi.host"),
 
 		DBurl:      viper.GetString("db.url"),
 		DBport:     viper.GetString("db.port"),

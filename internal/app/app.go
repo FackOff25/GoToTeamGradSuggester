@@ -88,7 +88,5 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
 	e.GET("/api/v1/suggest/ping", c.Ping)
 
-	e.GET("/api/v1/suggest/route", c.GetRoute)
-
 	return nil
 }
