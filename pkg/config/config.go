@@ -11,11 +11,18 @@ type Config struct {
 	ServerAddress string
 	ServerPort    string
 	PlacesApiHost string
-	LogAppName    string
-	LogLevel      int
-	LogFormat     string
-	LogOutput     string
-	Categories    []string
+
+	DBurl      string
+	DBport     string
+	DBuser     string
+	DBpassword string
+	DBname     string
+
+	LogAppName string
+	LogLevel   int
+	LogFormat  string
+	LogOutput  string
+	Categories []string
 }
 
 func GetConfig(configPath string) (*Config, error) {
@@ -31,11 +38,18 @@ func GetConfig(configPath string) (*Config, error) {
 		ServerAddress: viper.GetString("server.address"),
 		ServerPort:    viper.GetString("server.port"),
 		PlacesApiHost: viper.GetString("placesApi.host"),
-		LogAppName:    "Suggest",
-		LogLevel:      viper.GetInt("logger.level"),
-		LogFormat:     viper.GetString("logger.format"),
-		LogOutput:     viper.GetString("logger.output"),
-		Categories:    viper.GetStringSlice("categories"),
+
+		DBurl:      viper.GetString("db.url"),
+		DBport:     viper.GetString("db.port"),
+		DBuser:     viper.GetString("db.user"),
+		DBpassword: viper.GetString("db.password"),
+		DBname:     viper.GetString("db.name"),
+
+		LogAppName: "Suggest",
+		LogLevel:   viper.GetInt("logger.level"),
+		LogFormat:  viper.GetString("logger.format"),
+		LogOutput:  viper.GetString("logger.output"),
+		Categories: viper.GetStringSlice("categories"),
 	}
 
 	return &config, nil

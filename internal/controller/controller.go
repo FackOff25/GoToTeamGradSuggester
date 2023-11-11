@@ -3,11 +3,14 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"html"
 	"net/http"
 	"strconv"
 
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,12 +22,54 @@ type Controller struct {
 	Cfg     *config.Config
 }
 
-func (pc *Controller) Get(c echo.Context) error {
+func (pc *Controller) Ping(c echo.Context) error {
+	defer c.Request().Body.Close()
+	return c.JSON(http.StatusOK, nil)
+}
+
+func (pc *Controller) GetUser(c echo.Context) error {
 	defer c.Request().Body.Close()
 
-	user, _ := pc.Usecase.GetUser("")
+	id := html.EscapeString(c.Request().Header.Get("X-UUID"))
 
-	return c.JSON(http.StatusOK, user)
+	u, err := pc.Usecase.GetUser(id)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return echo.ErrNotFound
+		}
+		log.Errorf("Repo error: %s; id: %s", err.Error(), id)
+		return echo.ErrInternalServerError
+	}
+
+	u.PlaceTypePreferences = nil // на клиенте не нужны предпочтения
+	b, err := json.Marshal(u)
+	if err != nil {
+		log.Errorf("Marshal error: %s; id: %s", err.Error(), id)
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSONBlob(http.StatusOK, b)
+}
+
+func (pc *Controller) AddUser(c echo.Context) error {
+	defer c.Request().Body.Close()
+
+	id := html.EscapeString(c.Request().Header.Get("X-UUID"))
+
+	if id == "" {
+		return echo.ErrBadRequest
+	}
+
+	err := pc.Usecase.AddUser(id)
+	if err != nil {
+		if err.Error() == domain.ErrorUserAlreadyExists {
+			return echo.ErrConflict
+		}
+		log.Errorf("Repo error: %s; id: %s", err.Error(), id)
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusOK, nil)
 }
 
 func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {

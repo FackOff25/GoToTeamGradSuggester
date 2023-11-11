@@ -8,6 +8,10 @@ const (
 	TypePlacePark   = "park"
 	TypePlaceCafe   = "cafe"
 	TypePlaceMuseum = "museum"
+
+	ReactionLike    = "like"
+	ReactionVisited = "visited"
+	ReactionRefuse  = "refuse"
 )
 
 type ApiLocation struct {

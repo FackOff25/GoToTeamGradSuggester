@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func CreateNotImplementedResponse(c echo.Context) error {
+func NewUser(c echo.Context) error {
 	defer c.Request().Body.Close()
 
 	response := "Not implemented\n"

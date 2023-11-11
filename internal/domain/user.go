@@ -1,11 +1,13 @@
 package domain
 
-import "github.com/google/uuid"
+const (
+	ErrorUserAlreadyExists = "user already exists"
+)
 
 type User struct {
-	Id                   uuid.UUID
-	Username             string
-	PlaceTypePreferences map[string]float32
+	Id                   string             `json:"id,omitempty"`
+	Username             string             `json:"username,omitempty"`
+	PlaceTypePreferences map[string]float32 `json:"preferences,omitempty"`
 }
 
 type NewReactionRequest struct {

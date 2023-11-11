@@ -7,6 +7,7 @@ import (
 )
 
 type UsecaseInterface interface {
+	AddUser(id string) error
 	GetUser(uuid string) (*domain.User, error)
 	ApplyUserReactionToPlace(uuid string, placeId string, reaction string) error
 	GetNearbyPlaces(cfg *config.Config, location string, radius int, placeType string, pageToken string) ([]googleApi.Place, string, error)

@@ -13,6 +13,6 @@ type Repo struct {
 func New(queries QueriesInterface, ctx context.Context) *Repo {
 	return &Repo{
 		QueriesInterface: queries,
-		ctx: ctx,
+		ctx:              ctx,
 	}
 }
