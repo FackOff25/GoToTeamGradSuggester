@@ -3,6 +3,8 @@ server:
   port: "80"
 placesApi:
   host: "@PROXY_URL@"
+routesApi:
+  host: "@ROUTES_PROXY_URL@"
 logger:
   format: plain
   level: 6
