@@ -80,8 +80,8 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 	c := controller.Controller{Usecase: uc, Cfg: config}
 
 	e.GET("/api/v1/suggest/nearby", c.CreatePlacesListHandler)
-	e.GET("/api/v1/user/", c.GetUser)
-	e.POST("/api/v1/user/new", c.AddUser)
+	e.GET("/api/v1/suggest/user/", c.GetUser)
+	e.POST("/api/v1/suggest/user/new", c.AddUser)
 
 	e.POST("/api/v1/suggest/reaction", c.CreateNewReactionHandler)
 
