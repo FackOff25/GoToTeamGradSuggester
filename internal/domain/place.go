@@ -9,9 +9,12 @@ const (
 	TypePlaceCafe   = "cafe"
 	TypePlaceMuseum = "museum"
 
-	ReactionLike    = "like"
-	ReactionVisited = "visited"
-	ReactionRefuse  = "refuse"
+	ReactionLike      = "like"
+	ReactionVisited   = "visited"
+	ReactionRefuse    = "refuse"
+	ReactionUnlike    = "unlike"
+	ReactionUnvisited = "unvisited"
+	ReactionUnrefuse  = "unrefuse"
 )
 
 type ApiLocation struct {
