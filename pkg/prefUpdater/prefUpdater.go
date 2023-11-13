@@ -1,7 +1,8 @@
 package prefupdater
 
 const (
-	MaxPreferenceValue = 100
+	MaxPreferenceValue = 20
+	MinPreferenceValue = 0.1
 	LikeUpdateValue    = 0.4
 	VisitedUpdateValue = 0.1
 	RefuseUpdateValue  = 0.3
@@ -36,6 +37,10 @@ func UnlikeUpdateFunc(preference float32) float32 {
 
 	preference -= difference
 
+	if preference < MinPreferenceValue {
+		preference = MinPreferenceValue
+	}
+
 	return preference
 }
 
@@ -64,6 +69,10 @@ func UnvisitedUpdateFunc(preference float32) float32 {
 
 	preference -= difference
 
+	if preference < MinPreferenceValue {
+		preference = MinPreferenceValue
+	}
+
 	return preference
 }
 
@@ -77,6 +86,10 @@ func RefuseUpdateFunc(preference float32) float32 {
 	difference /= RefuseUpdateValue
 
 	preference -= difference
+
+	if preference < MinPreferenceValue {
+		preference = MinPreferenceValue
+	}
 
 	return preference
 }
