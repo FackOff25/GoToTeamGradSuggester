@@ -11,27 +11,27 @@ logger:
   name: suggest
   output: ./log/sugest.log
 categories:
-  - amusement_park
-  - aquarium
+#  - amusement_park
+#  - aquarium
 #  - art_gallery
 #  - bar
-  - mosque
+#  - mosque
 #  - movie_theater
 #  - bowling_alley
-  - museum
+#  - museum
 #  - cafe
 #  - night_club
   - park
 #  - casino
-  - church
-  - city_hall
+#  - church
+#  - city_hall
 #  - restaurant
 #  - shopping_mall
-  - stadium
-  - synagogue
-  - tourist_attraction
-  - hindu_temple
-  - zoo
+#  - stadium
+#  - synagogue
+#  - tourist_attraction
+#  - hindu_temple
+#  - zoo
 db:
   url: "@DB_URL@"
   port: "@DB_PORT@"
