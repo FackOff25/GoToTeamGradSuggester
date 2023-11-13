@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
+	prefupdater "github.com/FackOff25/GoToTeamGradSuggester/pkg/prefUpdater"
 )
 
 const (
@@ -73,15 +74,23 @@ func (q *Queries) ApplyUserReactionToPlace(uuid string, placeId string, reaction
 
 	var multiplier float32
 
+	var ReactionFunc func(pref float32) float32
+
 	switch reaction {
 	case domain.ReactionVisited:
-		multiplier = 3
+		ReactionFunc = prefupdater.VisitedUpdateFunc
+	case domain.ReactionUnvisited:
+		ReactionFunc = prefupdater.UnvisitedUpdateFunc
 	case domain.ReactionLike:
-		multiplier = 5
+		ReactionFunc = prefupdater.LikeUpdateFunc
+	case domain.ReactionUnlike:
+		ReactionFunc = prefupdater.UnlikeUpdateFunc
 	case domain.ReactionRefuse:
-		multiplier = 0.5
+		ReactionFunc = prefupdater.RefuseUpdateFunc
+	case domain.ReactionUnrefuse:
+		ReactionFunc = prefupdater.UnrefuseUpdateFunc
 	default:
-		multiplier = 1
+		ReactionFunc = prefupdater.DefaultUpdateFunc
 	}
 
 	for _, v := range types {
@@ -90,6 +99,13 @@ func (q *Queries) ApplyUserReactionToPlace(uuid string, placeId string, reaction
 			u.PlaceTypePreferences[v] *= multiplier
 		} else {
 			u.PlaceTypePreferences[v] = 1
+		}
+	}
+
+	for _, v := range types {
+		_, ok := u.PlaceTypePreferences[v]
+		if ok {
+			u.PlaceTypePreferences[v] = ReactionFunc(u.PlaceTypePreferences[v])
 		}
 	}
 
