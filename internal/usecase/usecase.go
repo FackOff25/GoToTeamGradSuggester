@@ -15,7 +15,6 @@ import (
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
-	prefupdater "github.com/FackOff25/GoToTeamGradSuggester/pkg/prefUpdater"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -57,9 +56,9 @@ func calculateSortValue(user *domain.User, place googleApi.Place) float32 {
 		parameterCounter++
 	}
 
-	ratingWeight := float32(place.Rating * ratingWeight * (float64(place.RatingCount / 500)))
-	if ratingWeight > prefupdater.MaxPreferenceValue {
-		ratingWeight = prefupdater.MaxPreferenceValue
+	ratingWeight := float32(place.Rating * ratingWeight)
+	if ratingWeight > 100 {
+		ratingWeight = 100
 	}
 	value += ratingWeight
 	parameterCounter++
