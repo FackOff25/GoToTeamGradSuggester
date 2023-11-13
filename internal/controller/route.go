@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
@@ -28,7 +30,17 @@ func (pc *Controller) GetRoute(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	resBody, err := pc.Usecase.GetRoute(&requestBody)
+	Greq, err := pc.Usecase.PrepareGreq(&requestBody)
+	if err != nil {
+		return echo.ErrBadRequest
+	}
+
+	route, err := pc.GetRouteFromG(Greq)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+
+	resBody, err := pc.Usecase.GetRoute(route, Greq.TravelMode)
 	if err != nil {
 		log.Errorf("getting route error: %s", err.Error())
 		return echo.ErrInternalServerError
@@ -41,4 +53,36 @@ func (pc *Controller) GetRoute(c echo.Context) error {
 	}
 
 	return c.JSONBlob(http.StatusOK, resBodyBytes)
+}
+
+func (pc *Controller) GetRouteFromG(GreqBody *domain.GrouteRequest) (*domain.GrouteResp, error) {
+	BytesGreqBody, err := json.Marshal(GreqBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request := pc.Cfg.RoutesApiHost
+
+	client := &http.Client{}
+	Grequest, err := http.NewRequest(http.MethodPost, request, bytes.NewReader(BytesGreqBody))
+	if err != nil {
+		return nil, err
+	}
+
+	Grequest.Header.Set("Proxy-Header", "go-explore")
+	Grequest.Header.Set("X-Goog-FieldMask", "routes.duration,routes.distanceMeters,routes.legs")
+
+	gHttpResp, err := client.Do(Grequest)
+	if err != nil {
+		return nil, err
+	}
+
+	data, _ := io.ReadAll(gHttpResp.Body)
+	var result domain.GrouteResp
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

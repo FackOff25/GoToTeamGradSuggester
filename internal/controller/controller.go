@@ -118,7 +118,10 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 		}
 	}
 
-	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset)
+	places, err := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
 
 	places = pc.Usecase.UniqPlaces(places)
 

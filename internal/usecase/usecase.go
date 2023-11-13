@@ -132,7 +132,7 @@ func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, 
 	waitGroup := new(sync.WaitGroup)
 	result := []googleApi.Place{}
 
-	goroutineFunc := func(placeType string) {
+	goroutineFunc := func(placeType string) { // TODO: fix race condition
 		defer waitGroup.Done()
 		typeResult, _, err := uc.GetNearbyPlaces(cfg, location, radius, placeType, "")
 		if err != nil {
@@ -146,6 +146,11 @@ func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, 
 		go goroutineFunc(placeType)
 	}
 	waitGroup.Wait()
+
+	err := uc.repo.SavePlaces(result)
+	if err != nil {
+		return nil, err
+	}
 
 	return uc.proceedPlaces(cfg, user, result), nil
 }

@@ -1,15 +1,11 @@
 package usecase
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/gamilton"
-
-	"bytes"
-	"encoding/json"
-	"io"
-	"net/http"
 )
 
 // first element is starting point, second is last (can be the same one)
@@ -50,7 +46,7 @@ func makeGraphMatrix(places []domain.ApiLocation) [][]float64 {
 	return matrix
 }
 
-func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
+func (uc *UseCase) PrepareGreq(req *domain.RouteReq) (*domain.GrouteRequest, error) {
 	if req.TravelMode == "" {
 		req.TravelMode = domain.TravelModeWalk
 	}
@@ -59,12 +55,15 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 	unsortedPlaces = append(unsortedPlaces, req.Start)
 	unsortedPlaces = append(unsortedPlaces, req.End)
 
-
 	for _, v := range req.Waypoints {
 		unsortedPlaces = append(unsortedPlaces, v.Location)
 	}
 
 	sortedPlaces := sortPlacesForRoute(unsortedPlaces)
+	if len(sortedPlaces) == 0 {
+		return nil, fmt.Errorf("error: empty route slice")
+	}
+
 	GreqBody := domain.GrouteRequest{
 		TravelMode:    req.TravelMode,
 		Intermediates: make([]domain.Gwaypoint, 0),
@@ -80,38 +79,13 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 		}
 	}
 
+	return &GreqBody, nil
+}
 
-	BytesGreqBody, err := json.Marshal(GreqBody)
-	if err != nil {
-		return nil, err
-	}
+func (uc *UseCase) GetRoute(gRoute *domain.GrouteResp, travelMode string) (*domain.Route, error) {
+	clientResp := domain.Route{TravelMode: travelMode, Polylines: make([]domain.Polyline, 0)}
 
-	request := uc.cfg.RoutesApiHost
-
-	client := &http.Client{}
-	Grequest, err := http.NewRequest(http.MethodPost, request, bytes.NewReader(BytesGreqBody))
-	if err != nil {
-		return nil, err
-	}
-
-	Grequest.Header.Set("Proxy-Header", "go-explore")
-	Grequest.Header.Set("X-Goog-FieldMask", "routes.duration,routes.distanceMeters,routes.legs")
-
-	gHttpResp, err := client.Do(Grequest)
-	if err != nil {
-		return nil, err
-	}
-
-	data, _ := io.ReadAll(gHttpResp.Body)
-	var result domain.GrouteResp
-	err = json.Unmarshal(data, &result)
-	if err != nil {
-		return nil, err
-	}
-
-	clientResp := domain.Route{TravelMode: GreqBody.TravelMode, Polylines: make([]domain.Polyline, 0)}
-
-	for _, v := range result.Routes {
+	for _, v := range gRoute.Routes {
 		for _, val := range v.Legs {
 			clientResp.Polylines = append(clientResp.Polylines, domain.Polyline{PolylineString: val.Polyline.EncodedPolyline})
 		}
