@@ -137,7 +137,7 @@ func (uc *UseCase) GetNearbyPlaces(cfg *config.Config, location string, radius i
 	return result.Result, result.NextPageToken, nil
 }
 
-func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error) {
+func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int, types []string) ([]domain.SuggestPlace, error) {
 	waitGroup := new(sync.WaitGroup)
 	result := []googleApi.Place{}
 
@@ -150,7 +150,11 @@ func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, 
 		result = append(result, typeResult...)
 	}
 
-	for _, placeType := range cfg.Categories {
+	if len(types) == 0 {
+		types = cfg.Categories
+	}
+
+	for _, placeType := range types {
 		waitGroup.Add(1)
 		go goroutineFunc(placeType)
 	}
