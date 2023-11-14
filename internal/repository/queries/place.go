@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	addPlaceQuery          = `INSERT INTO places (place_id, types) VALUES ($1, $2);`
-	getPlaceByPlaceIdQuery = `SELECT id, place_id, types FROM places WHERE place_id = $1;`
-	getPlaceByUUIDQuery    = `SELECT id, place_id, types FROM places WHERE id = $1;`
+	addPlaceQuery               = `INSERT INTO places (place_id, types) VALUES ($1, $2);`
+	getPlaceTypesByPlaceIdQuery = `SELECT types FROM places WHERE place_id = $1;`
+	getPlaceByUUIDQuery         = `SELECT id, place_id, types FROM places WHERE id = $1;`
 )
 
 func (q *Queries) AddPlace(gID string, types []string) error {
@@ -28,7 +28,7 @@ func (q *Queries) AddPlace(gID string, types []string) error {
 
 func (q *Queries) GetPlaceById(gID string) (*domain.DbPlace, error) {
 	var types string
-	row := q.Pool.QueryRow(q.Ctx, getPlaceByPlaceIdQuery, gID)
+	row := q.Pool.QueryRow(q.Ctx, getPlaceTypesByPlaceIdQuery, gID)
 
 	err := row.Scan(&types)
 	if err != nil {
@@ -51,13 +51,15 @@ func (q *Queries) LikePlace(gId, userId, reaction string) error {
 func (q *Queries) SavePlaces(p []googleApi.Place) error {
 	for _, v := range p {
 		_, err := q.GetPlaceById(v.PlaceId)
-		if err == pgx.ErrNoRows {
-			err := q.AddPlace(v.PlaceId, v.Types)
-			if err != nil {
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				err := q.AddPlace(v.PlaceId, v.Types)
+				if err != nil {
+					return err
+				}
+			} else {
 				return err
 			}
-		} else {
-			return err
 		}
 	}
 	return nil
