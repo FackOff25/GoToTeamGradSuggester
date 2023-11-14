@@ -9,7 +9,7 @@ import (
 )
 
 // first element is starting point, second is last (can be the same one)
-func sortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
+func SortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
 	matrix := makeGraphMatrix(places)
 	path := gamilton.HungryAlgorythm(matrix)
 
@@ -59,7 +59,7 @@ func (uc *UseCase) PrepareGreq(req *domain.RouteReq) (*domain.GrouteRequest, err
 		unsortedPlaces = append(unsortedPlaces, v.Location)
 	}
 
-	sortedPlaces := sortPlacesForRoute(unsortedPlaces)
+	sortedPlaces := SortPlacesForRoute(unsortedPlaces)
 	if len(sortedPlaces) == 0 {
 		return nil, fmt.Errorf("error: empty route slice")
 	}

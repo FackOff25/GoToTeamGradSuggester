@@ -27,7 +27,10 @@ func (pc *Controller) CreateNewReactionHandler(c echo.Context) error {
 	if requestBody.PlaceId == "" ||
 		(requestBody.Reaction != domain.ReactionVisited &&
 			requestBody.Reaction != domain.ReactionLike &&
-			requestBody.Reaction != domain.ReactionRefuse) {
+			requestBody.Reaction != domain.ReactionRefuse &&
+			requestBody.Reaction != domain.ReactionUnvisited &&
+			requestBody.Reaction != domain.ReactionUnlike &&
+			requestBody.Reaction != domain.ReactionUnrefuse) {
 		return echo.ErrBadRequest
 	}
 

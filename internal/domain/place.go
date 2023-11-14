@@ -9,10 +9,17 @@ const (
 	TypePlaceCafe   = "cafe"
 	TypePlaceMuseum = "museum"
 
-	ReactionLike    = "like"
-	ReactionVisited = "visited"
-	ReactionRefuse  = "refuse"
+	ReactionLike      = "like"
+	ReactionVisited   = "visited"
+	ReactionRefuse    = "refuse"
+	ReactionUnlike    = "unlike"
+	ReactionUnvisited = "unvisited"
+	ReactionUnrefuse  = "unrefuse"
 )
+
+type GetCategoriesResponse struct {
+	Categories []string `json:"categories"`
+}
 
 type ApiLocation struct {
 	Lat float64 `json:"lat,omitempty"`
