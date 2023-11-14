@@ -20,6 +20,16 @@ type RouteReq struct {
 	Waypoints  []Waypoint  `json:"waypoints,omitempty"`
 }
 
+type SortPlacesReq struct {
+	Start     ApiLocation `json:"start,omitempty"`
+	End       ApiLocation `json:"end,omitempty"`
+	Waypoints []Waypoint  `json:"waypoints,omitempty"`
+}
+
+type SortPlacesResp struct {
+	Places []ApiLocation `json:"places"`
+}
+
 type Polyline struct {
 	PolylineString string `json:"polyline,omitempty"`
 }
