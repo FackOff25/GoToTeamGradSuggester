@@ -118,7 +118,9 @@ func (pc *Controller) SortPlaces(c echo.Context) error {
 	path = usecase.SortPlacesForRoute(path)
 
 	resp := domain.SortPlacesResp{
-		Places: path,
+		Start:     path[0],
+		End:       path[len(path)-1],
+		Waypoints: path[1 : len(path)-1],
 	}
 
 	resBodyBytes := new(bytes.Buffer)

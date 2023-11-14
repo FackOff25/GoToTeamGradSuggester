@@ -27,7 +27,9 @@ type SortPlacesReq struct {
 }
 
 type SortPlacesResp struct {
-	Places []ApiLocation `json:"places"`
+	Start     ApiLocation   `json:"start,omitempty"`
+	End       ApiLocation   `json:"end,omitempty"`
+	Waypoints []ApiLocation `json:"waypoints,omitempty"`
 }
 
 type Polyline struct {
