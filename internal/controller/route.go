@@ -62,8 +62,6 @@ func (pc *Controller) SortPlaces(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	log.Infof("%#v", requestBody)
-
 	path := make([]domain.ApiLocation, 0)
 
 	path = append(path, requestBody.Start)
@@ -71,7 +69,6 @@ func (pc *Controller) SortPlaces(c echo.Context) error {
 	for _, v := range requestBody.Waypoints {
 		path = append(path, v.Location)
 	}
-	log.Infof("%v", path)
 
 	path = usecase.SortPlacesForRoute(path)
 
