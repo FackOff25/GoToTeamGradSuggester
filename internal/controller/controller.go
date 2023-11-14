@@ -120,6 +120,7 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	places, err := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset)
 	if err != nil {
+		log.Error(err)
 		return echo.ErrInternalServerError
 	}
 
@@ -127,9 +128,13 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 
 	places = pc.Usecase.SortPlaces(places)
 
-	places = places[offset:]
-	if len(places) > limit {
-		places = places[:limit]
+	if len(places) > offset {
+		places = places[offset:]
+		if len(places) > limit {
+			places = places[:limit]
+		}
+	} else {
+		places = []domain.SuggestPlace{}
 	}
 
 	resBodyBytes := new(bytes.Buffer)
