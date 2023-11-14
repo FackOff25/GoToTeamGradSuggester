@@ -92,5 +92,7 @@ func configureServer(e *echo.Echo, config *config.Config) error {
 
 	e.GET("/api/v1/suggest/categories/list", c.GetCategoriesHandler)
 
+	e.POST("/api/v1/suggest/route/sortPlaces", c.SortPlaces)
+
 	return nil
 }

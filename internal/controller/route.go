@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
+	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
@@ -39,4 +41,48 @@ func (pc *Controller) GetRoute(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 	return c.JSON(http.StatusOK, "OK")
+}
+
+func (pc *Controller) SortPlaces(c echo.Context) error {
+	defer c.Request().Body.Close()
+
+	uuid, ok := c.Request().Header[uuidHeader]
+	if !ok {
+		return echo.ErrUnauthorized
+	}
+
+	u, _ := pc.Usecase.GetUser(uuid[0])
+	if u == nil {
+		return echo.ErrUnauthorized
+	}
+
+	var requestBody domain.SortPlacesReq
+	err := json.NewDecoder(c.Request().Body).Decode(&requestBody)
+	if err != nil {
+		return echo.ErrBadRequest
+	}
+
+	log.Infof("%#v", requestBody)
+
+	path := make([]domain.ApiLocation, 0)
+
+	path = append(path, requestBody.Start)
+	path = append(path, requestBody.End)
+	for _, v := range requestBody.Waypoints {
+		path = append(path, v.Location)
+	}
+	log.Infof("%v", path)
+
+	path = usecase.SortPlacesForRoute(path)
+
+	resp := domain.SortPlacesResp{
+		Places: path,
+	}
+
+	resBodyBytes := new(bytes.Buffer)
+	encoder := json.NewEncoder(resBodyBytes)
+	encoder.SetEscapeHTML(false)
+	encoder.Encode(resp)
+
+	return c.JSONBlob(http.StatusOK, resBodyBytes.Bytes())
 }

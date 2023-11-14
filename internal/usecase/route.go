@@ -17,7 +17,7 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 		unsortedPlaces = append(unsortedPlaces, v.Location)
 	}
 
-	sortedPlaces := sortPlacesForRoute(unsortedPlaces)
+	sortedPlaces := SortPlacesForRoute(unsortedPlaces)
 	Greq := domain.GrouteRequest{
 		TravelMode:    req.TravelMode,
 		Intermediates: make([]domain.Gwaypoint, 0),
@@ -37,8 +37,7 @@ func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
 }
 
 // first element is starting point, second is last (can be the same one)
-func sortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
-	return places
+func SortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
 	matrix := makeGraphMatrix(places)
 	path := gamilton.HungryAlgorythm(matrix)
 
