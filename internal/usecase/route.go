@@ -1,40 +1,12 @@
 package usecase
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/gamilton"
 )
-
-func (uc *UseCase) GetRoute(req *domain.RouteReq) (*domain.Route, error) {
-	if req.TravelMode == "" {
-		req.TravelMode = domain.TravelModeWalk
-	}
-
-	unsortedPlaces := make([]domain.ApiLocation, 0)
-	for _, v := range req.Waypoints {
-		unsortedPlaces = append(unsortedPlaces, v.Location)
-	}
-
-	sortedPlaces := SortPlacesForRoute(unsortedPlaces)
-	Greq := domain.GrouteRequest{
-		TravelMode:    req.TravelMode,
-		Intermediates: make([]domain.Gwaypoint, 0),
-	}
-
-	for i, v := range sortedPlaces {
-		if i == 0 {
-			Greq.Origin = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}}
-		} else if i == len(sortedPlaces)-1 {
-			Greq.Destination = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}}
-		} else {
-			Greq.Intermediates = append(Greq.Intermediates, domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}})
-		}
-	}
-
-	return nil, nil
-}
 
 // first element is starting point, second is last (can be the same one)
 func SortPlacesForRoute(places []domain.ApiLocation) []domain.ApiLocation {
@@ -72,4 +44,52 @@ func makeGraphMatrix(places []domain.ApiLocation) [][]float64 {
 	}
 
 	return matrix
+}
+
+func (uc *UseCase) PrepareGreq(req *domain.RouteReq) (*domain.GrouteRequest, error) {
+	if req.TravelMode == "" {
+		req.TravelMode = domain.TravelModeWalk
+	}
+
+	unsortedPlaces := make([]domain.ApiLocation, 0)
+	unsortedPlaces = append(unsortedPlaces, req.Start)
+	unsortedPlaces = append(unsortedPlaces, req.End)
+
+	for _, v := range req.Waypoints {
+		unsortedPlaces = append(unsortedPlaces, v.Location)
+	}
+
+	sortedPlaces := SortPlacesForRoute(unsortedPlaces)
+	if len(sortedPlaces) == 0 {
+		return nil, fmt.Errorf("error: empty route slice")
+	}
+
+	GreqBody := domain.GrouteRequest{
+		TravelMode:    req.TravelMode,
+		Intermediates: make([]domain.Gwaypoint, 0),
+	}
+
+	for i, v := range sortedPlaces {
+		if i == 0 {
+			GreqBody.Origin = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}}
+		} else if i == len(sortedPlaces)-1 {
+			GreqBody.Destination = domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}}
+		} else {
+			GreqBody.Intermediates = append(GreqBody.Intermediates, domain.Gwaypoint{Glocation: domain.Glocation{GlatLng: domain.GlatLng(v)}})
+		}
+	}
+
+	return &GreqBody, nil
+}
+
+func (uc *UseCase) GetRoute(gRoute *domain.GrouteResp, travelMode string) (*domain.Route, error) {
+	clientResp := domain.Route{TravelMode: travelMode, Polylines: make([]domain.Polyline, 0)}
+
+	for _, v := range gRoute.Routes {
+		for _, val := range v.Legs {
+			clientResp.Polylines = append(clientResp.Polylines, domain.Polyline{PolylineString: val.Polyline.EncodedPolyline})
+		}
+	}
+
+	return &clientResp, nil
 }

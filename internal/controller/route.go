@@ -3,12 +3,11 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
-	"strings"
 
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
-	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
@@ -32,15 +31,61 @@ func (pc *Controller) GetRoute(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	// err = pc.Usecase.ApplyUserReactionToPlace(uuid[0], requestBody.PlaceId, requestBody.Reaction)
+	Greq, err := pc.Usecase.PrepareGreq(&requestBody)
 	if err != nil {
-		if strings.Contains(err.Error(), pgx.ErrNoRows.Error()) {
-			return echo.ErrNotFound
-		}
-		log.Errorf("applying error: %s", err.Error())
+		return echo.ErrBadRequest
+	}
+
+	route, err := pc.GetRouteFromG(Greq)
+	if err != nil {
 		return echo.ErrInternalServerError
 	}
-	return c.JSON(http.StatusOK, "OK")
+
+	resBody, err := pc.Usecase.GetRoute(route, Greq.TravelMode)
+	if err != nil {
+		log.Errorf("getting route error: %s", err.Error())
+		return echo.ErrInternalServerError
+	}
+
+	resBodyBytes, err := json.Marshal(resBody)
+	if err != nil {
+		log.Errorf("marshaling error: %s", err.Error())
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSONBlob(http.StatusOK, resBodyBytes)
+}
+
+func (pc *Controller) GetRouteFromG(GreqBody *domain.GrouteRequest) (*domain.GrouteResp, error) {
+	BytesGreqBody, err := json.Marshal(GreqBody)
+	if err != nil {
+		return nil, err
+	}
+
+	request := pc.Cfg.RoutesApiHost
+
+	client := &http.Client{}
+	Grequest, err := http.NewRequest(http.MethodPost, request, bytes.NewReader(BytesGreqBody))
+	if err != nil {
+		return nil, err
+	}
+
+	Grequest.Header.Set("Proxy-Header", "go-explore")
+	Grequest.Header.Set("X-Goog-FieldMask", "routes.duration,routes.distanceMeters,routes.legs")
+
+	gHttpResp, err := client.Do(Grequest)
+	if err != nil {
+		return nil, err
+	}
+
+	data, _ := io.ReadAll(gHttpResp.Body)
+	var result domain.GrouteResp
+	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
 
 func (pc *Controller) SortPlaces(c echo.Context) error {

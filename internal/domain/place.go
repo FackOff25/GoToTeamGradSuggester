@@ -38,6 +38,11 @@ type ApiPlace struct {
 	// Types          []string  `json:"types,omitempty"`
 }
 
+type DbPlace struct {
+	Place_id string
+	Types    []string
+}
+
 type SuggestPlace struct {
 	PlaceId     string      `json:"place_id,omitempty"`
 	Name        string      `json:"name,omitempty"`

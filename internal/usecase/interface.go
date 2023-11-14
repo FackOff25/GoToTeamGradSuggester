@@ -14,4 +14,6 @@ type UsecaseInterface interface {
 	GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int, types []string) ([]domain.SuggestPlace, error)
 	SortPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
 	UniqPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
+	GetRoute(req *domain.GrouteResp, travelMode string) (*domain.Route, error)
+	PrepareGreq(req *domain.RouteReq) (*domain.GrouteRequest, error)
 }

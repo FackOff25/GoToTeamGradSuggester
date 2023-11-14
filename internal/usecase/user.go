@@ -37,13 +37,22 @@ func (uc *UseCase) GetUser(uuid string) (*domain.User, error) {
 }
 
 func (uc *UseCase) ApplyUserReactionToPlace(uuid string, placeId string, reaction string) error {
-	types := getPlaceTypes(placeId)
+	var types []string
+	p, err := uc.repo.GetPlaceById(placeId)
+	types = p.Types
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			types = getPlaceTypes(placeId)
+		} else {
+			return err
+		}
+	}
 
 	if len(types) == 0 {
 		return fmt.Errorf("no place types for place with id: %s", placeId)
 	}
 
-	err := uc.repo.ApplyUserReactionToPlace(uuid, placeId, reaction, types)
+	err = uc.repo.ApplyUserReactionToPlace(uuid, placeId, reaction, types)
 
 	return err
 }
