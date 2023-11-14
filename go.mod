@@ -3,7 +3,7 @@ module github.com/FackOff25/GoToTeamGradSuggester
 go 1.21.3
 
 require (
-	github.com/FackOff25/GoToTeamGradGoLibs v1.1.4
+	github.com/FackOff25/GoToTeamGradGoLibs v1.1.5
 	github.com/google/uuid v1.3.1
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/labstack/echo/v4 v4.11.2
@@ -43,5 +43,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/FackOff25/GoToTeamGradGoLibs => ../GoToTeamGradGoLibs
