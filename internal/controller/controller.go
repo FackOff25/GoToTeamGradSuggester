@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/FackOff25/GoToTeamGradGoLibs/categories"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
@@ -133,6 +134,31 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	encoder := json.NewEncoder(resBodyBytes)
 	encoder.SetEscapeHTML(false)
 	encoder.Encode(places)
+
+	return c.JSONBlob(http.StatusOK, resBodyBytes.Bytes())
+}
+
+func (pc *Controller) GetCategoriesHandler(c echo.Context) error {
+	defer c.Request().Body.Close()
+
+	var result []string
+	categoriesMap := categories.GetCategoriesMap()
+	for _, v := range pc.Cfg.Categories {
+		cat, ok := categoriesMap[v]
+		if ok {
+			result = append(result, cat)
+		}
+
+	}
+
+	resp := domain.GetCategoriesResponse{
+		Categories: result,
+	}
+
+	resBodyBytes := new(bytes.Buffer)
+	encoder := json.NewEncoder(resBodyBytes)
+	encoder.SetEscapeHTML(false)
+	encoder.Encode(resp)
 
 	return c.JSONBlob(http.StatusOK, resBodyBytes.Bytes())
 }

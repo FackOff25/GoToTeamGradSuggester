@@ -17,6 +17,10 @@ const (
 	ReactionUnrefuse  = "unrefuse"
 )
 
+type GetCategoriesResponse struct {
+	Categories []string `json:"categories"`
+}
+
 type ApiLocation struct {
 	Lat float64 `json:"lat,omitempty"`
 	Lng float64 `json:"lng,omitempty"`
