@@ -6,6 +6,7 @@ import (
 	"html"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/FackOff25/GoToTeamGradGoLibs/categories"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/domain"
@@ -119,7 +120,22 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 		}
 	}
 
-	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset)
+	types := []string{}
+	if c.QueryParams().Has("types") {
+		typesStr := c.QueryParam("types")
+		typesSlice := strings.Split(typesStr, ",")
+		cats := categories.GetReversedCategoryMap()
+		for _, v := range typesSlice {
+			placeType, ok := cats[v]
+			if !ok {
+				log.Errorf("Bad category: %s", v)
+				return echo.ErrBadRequest
+			}
+			types = append(types, placeType)
+		}
+	}
+
+	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset, types)
 
 	places = pc.Usecase.UniqPlaces(places)
 
