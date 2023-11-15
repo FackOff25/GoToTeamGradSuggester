@@ -112,7 +112,7 @@ func (pc *Controller) SortPlaces(c echo.Context) error {
 	path = append(path, requestBody.Start)
 	path = append(path, requestBody.End)
 	for _, v := range requestBody.Waypoints {
-		path = append(path, v.Location)
+		path = append(path, v)
 	}
 
 	path = usecase.SortPlacesForRoute(path)
