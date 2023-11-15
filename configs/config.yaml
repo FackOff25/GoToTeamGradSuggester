@@ -15,7 +15,7 @@ categories:
 #  - aquarium
 #  - art_gallery
 #  - bar
-  - mosque
+#  - mosque
 #  - movie_theater
 #  - bowling_alley
 #  - museum
@@ -23,14 +23,14 @@ categories:
 #  - night_club
   - park
 #  - casino
-  - church
+#  - church
 #  - city_hall
 #  - restaurant
 #  - shopping_mall
-  - stadium
-  - synagogue
-  - tourist_attraction
-  - hindu_temple
+#  - stadium
+#  - synagogue
+#  - tourist_attraction
+#  - hindu_temple
 #  - zoo
 db:
   url: "@DB_URL@"
