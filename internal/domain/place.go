@@ -8,7 +8,18 @@ const (
 	TypePlacePark   = "park"
 	TypePlaceCafe   = "cafe"
 	TypePlaceMuseum = "museum"
+
+	ReactionLike      = "like"
+	ReactionVisited   = "visited"
+	ReactionRefuse    = "refuse"
+	ReactionUnlike    = "unlike"
+	ReactionUnvisited = "unvisited"
+	ReactionUnrefuse  = "unrefuse"
 )
+
+type GetCategoriesResponse struct {
+	Categories []string `json:"categories"`
+}
 
 type ApiLocation struct {
 	Lat float64 `json:"lat,omitempty"`
@@ -25,6 +36,11 @@ type ApiPlace struct {
 	PlaceId        string      `json:"place_id,omitempty"`
 	ApiRatingCount int         `json:"user_ratings_total,omitempty"`
 	// Types          []string  `json:"types,omitempty"`
+}
+
+type DbPlace struct {
+	Place_id string
+	Types    []string
 }
 
 type SuggestPlace struct {

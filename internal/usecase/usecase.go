@@ -40,6 +40,7 @@ func calculateSortValue(user *domain.User, place googleApi.Place) float32 {
 	value := float32(0)
 	weights := getPlaceTypesWeight()
 
+	parameterCounter := 1
 	for _, placeType := range place.Types {
 		pref, ok := user.PlaceTypePreferences[placeType]
 		if !ok {
@@ -52,9 +53,17 @@ func calculateSortValue(user *domain.User, place googleApi.Place) float32 {
 		}
 
 		value += pref * weight
+		parameterCounter++
 	}
 
-	value += float32(place.Rating * ratingWeight)
+	ratingWeight := float32(place.Rating * ratingWeight)
+	if ratingWeight > 100 {
+		ratingWeight = 100
+	}
+	value += ratingWeight
+	parameterCounter++
+
+	value = value / float32(parameterCounter)
 	return value
 }
 
@@ -128,11 +137,11 @@ func (uc *UseCase) GetNearbyPlaces(cfg *config.Config, location string, radius i
 	return result.Result, result.NextPageToken, nil
 }
 
-func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int) ([]domain.SuggestPlace, error) {
+func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int, types []string) ([]domain.SuggestPlace, error) {
 	waitGroup := new(sync.WaitGroup)
 	result := []googleApi.Place{}
 
-	goroutineFunc := func(placeType string) {
+	goroutineFunc := func(placeType string) { // TODO: fix race condition
 		defer waitGroup.Done()
 		typeResult, _, err := uc.GetNearbyPlaces(cfg, location, radius, placeType, "")
 		if err != nil {
@@ -141,11 +150,20 @@ func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, 
 		result = append(result, typeResult...)
 	}
 
-	for _, placeType := range cfg.Categories {
+	if len(types) == 0 {
+		types = cfg.Categories
+	}
+
+	for _, placeType := range types {
 		waitGroup.Add(1)
 		go goroutineFunc(placeType)
 	}
 	waitGroup.Wait()
+
+	err := uc.repo.SavePlaces(result)
+	if err != nil {
+		return nil, err
+	}
 
 	return uc.proceedPlaces(cfg, user, result), nil
 }

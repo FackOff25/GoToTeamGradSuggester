@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -11,12 +12,11 @@ import (
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller/handler"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
-	"github.com/jackc/pgx/v5/pgxpool"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
+	"github.com/FackOff25/GoToTeamGradSuggester/pkg/postgres"
 	"github.com/labstack/echo/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 func Run(configFilePath string) {
@@ -67,18 +67,34 @@ func Run(configFilePath string) {
 
 func configureServer(e *echo.Echo, config *config.Config) error {
 	ctx := context.Background()
-	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: pgxpool.Pool{}}, ctx)
+	pg, err := postgres.New(fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s", config.DBuser, config.DBpassword, config.DBurl, config.DBport, config.DBname), ctx)
+	if err != nil {
+		return err
+	}
+	p, err := pg.Connect()
+	if err != nil {
+		return err
+	}
+	repo := repository.New(&queries.Queries{Ctx: ctx, Pool: *p}, ctx)
 	uc := usecase.New(*repo, ctx, config)
 
-	controller := controller.Controller{Usecase: uc, Cfg: config}
+	c := controller.Controller{Usecase: uc, Cfg: config}
 
-	e.GET("/api/v1/suggest/get", controller.Get)
+	e.GET("/api/v1/suggest/nearby", c.CreatePlacesListHandler)
+	e.GET("/api/v1/suggest/user/", c.GetUser)
+	e.POST("/api/v1/suggest/user/new", c.AddUser)
 
-	e.GET("/api/v1/suggest/nearby", controller.CreatePlacesListHandler)
-
-	e.POST("/api/v1/suggest/reaction", controller.CreateNewReactionHandler)
+	e.POST("/api/v1/suggest/reaction", c.CreateNewReactionHandler)
 
 	e.GET("/api/v1/suggest/dummy", handler.CreateNotImplementedResponse)
+	e.GET("/api/v1/suggest/ping", c.Ping)
+
+	e.POST("/api/v1/suggest/route", c.GetRoute)
+
+	e.GET("/api/v1/suggest/categories/list", c.GetCategoriesHandler)
+
+	e.POST("/api/v1/suggest/route/sortPlaces", c.SortPlaces)
 
 	return nil
 }
