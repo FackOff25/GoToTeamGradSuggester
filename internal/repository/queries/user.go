@@ -66,7 +66,7 @@ func (q *Queries) AddUser(id string, categories []string) error {
 	return nil
 }
 
-func (q *Queries) ApplyUserReactionToPlace(uuid string, placeId string, reaction string, types []string) error {
+func (q *Queries) UpdateUserPreferences(uuid string, placeId string, reaction string, types []string) error {
 	u, err := q.GetUser(uuid)
 	if err != nil {
 		return err
