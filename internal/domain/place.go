@@ -51,6 +51,6 @@ type SuggestPlace struct {
 	Photos      []string    `json:"photos,omitempty"`
 	Rating      float32     `json:"rating,omitempty"`
 	RatingCount int         `json:"rating_count,omitempty"`
-	Reaction    string      `json:"reactions,omitempty"`
+	Reaction    []string    `json:"reactions,omitempty"`
 	SortValue   float32     `json:"-"`
 }
