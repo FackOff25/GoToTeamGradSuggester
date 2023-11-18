@@ -16,6 +16,7 @@ const (
 	updateReactionQuery         = `UPDATE users_places SET %s = $1 WHERE user_id = $2 AND place_id = $3;`
 	insertReactionQuery         = `UPDATE INTO users_places(user_id, place_id, ) SET %s = $1 WHERE user_id = $2 AND place_id = $3;`
 	getUserPlaceReaction        = `SELECT like_mark, visited_mark FROM users_places WHERE place_id = $1 AND user_id = $2;`
+	insertDefaultReactionQuery  = `INSERT INTO users_places(place_id, user_id, like_mark, visited_mark) VALUES ($1, $2, false, false);`
 )
 
 func (q *Queries) AddPlace(gID string, types []string) error {
@@ -97,6 +98,8 @@ func (q *Queries) SaveUserReaction(userId, placeUuid, reaction string) error {
 		columnName = "like_mark"
 	} else if reaction == domain.ReactionVisited || reaction == domain.ReactionUnvisited {
 		columnName = "visited_mark"
+	} else {
+		return nil
 	}
 
 	if reaction == domain.ReactionLike || reaction == domain.ReactionVisited {
