@@ -182,9 +182,11 @@ func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places [
 						reactions := make([]string, 0)
 						if likeFlag {
 							reactions = append(reactions, domain.ReactionLike)
+							proceededPlace.SortValue *= 2
 						}
 						if visitedFlag {
 							reactions = append(reactions, domain.ReactionVisited)
+							proceededPlace.SortValue /= 1.5
 						}
 						proceededPlace.Reaction = reactions
 					}
