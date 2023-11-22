@@ -94,8 +94,8 @@ jobs:
           replace: ${{ secrets.PROD_PROXY_URL }}
           include: configs/config.yaml
 
-      - name: Add proxy url config for dev
-        if: ${{ github.ref == 'refs/heads/dev' }}
+      - name: Add proxy url config for PROD
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "@ROUTES_PROXY_URL@"
