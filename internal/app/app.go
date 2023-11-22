@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 
 	"github.com/FackOff25/GoToTeamGradGoLibs/logger"
+	"github.com/FackOff25/GoToTeamGradGoLibs/postgres"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/controller/handler"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/repository/queries"
 	"github.com/FackOff25/GoToTeamGradSuggester/internal/usecase"
 	"github.com/FackOff25/GoToTeamGradSuggester/pkg/config"
-	"github.com/FackOff25/GoToTeamGradSuggester/pkg/postgres"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )

@@ -175,6 +175,22 @@ func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places [
 		if isPlaceRight(place) {
 			proceededPlace, err := formNearbyPlace(uc.cfg, user, place)
 			if err == nil {
+				placeUuid, err := uc.repo.GetPlaceUuid(proceededPlace.PlaceId)
+				if placeUuid != "" && err == nil {
+					likeFlag, visitedFlag, err := uc.repo.GetUserReaction(user.Id, placeUuid)
+					if err == nil {
+						reactions := make([]string, 0)
+						if likeFlag {
+							reactions = append(reactions, domain.ReactionLike)
+							proceededPlace.SortValue *= 2
+						}
+						if visitedFlag {
+							reactions = append(reactions, domain.ReactionVisited)
+							proceededPlace.SortValue /= 1.5
+						}
+						proceededPlace.Reaction = reactions
+					}
+				}
 				proceeded = append(proceeded, proceededPlace)
 			}
 		}

@@ -52,8 +52,28 @@ func (uc *UseCase) ApplyUserReactionToPlace(uuid string, placeId string, reactio
 		return fmt.Errorf("no place types for place with id: %s", placeId)
 	}
 
-	err = uc.repo.ApplyUserReactionToPlace(uuid, placeId, reaction, types)
+	err = uc.repo.UpdateUserPreferences(uuid, placeId, reaction, types)
+	if err != nil {
+		return err
+	}
 
+	err = uc.SaveUserReaction(uuid, placeId, reaction)
+
+	return err
+}
+
+func (uc *UseCase) SaveUserReaction(userUuid, placeId, reaction string) error {
+	_, err := uc.GetUser(userUuid)
+	if err != nil {
+		return err
+	}
+
+	placeUuid, err := uc.repo.GetPlaceUuid(placeId)
+	if err != nil {
+		return err
+	}
+
+	err = uc.repo.SaveUserReaction(userUuid, placeUuid, reaction)
 	return err
 }
 
