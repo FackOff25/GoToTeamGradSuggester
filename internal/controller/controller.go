@@ -100,6 +100,9 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 			log.Errorf("Bad radius: %s", c.QueryParam("radius"))
 			return echo.ErrBadRequest
 		}
+		if radius > 6000 {
+			radius = 6000
+		}
 	}
 
 	limit := 20
