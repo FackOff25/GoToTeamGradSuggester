@@ -54,3 +54,13 @@ type SuggestPlace struct {
 	Reaction    []string    `json:"reactions,omitempty"`
 	SortValue   float32     `json:"-"`
 }
+
+type DummyStruct struct {}
+
+func GetFilterReactionsMap() map[string]DummyStruct {
+	var ds DummyStruct
+	return map[string]DummyStruct{
+		ReactionLike: ds,
+		ReactionVisited: ds,
+	}
+}

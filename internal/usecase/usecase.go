@@ -137,7 +137,7 @@ func (uc *UseCase) GetNearbyPlaces(cfg *config.Config, location string, radius i
 	return result.Result, result.NextPageToken, nil
 }
 
-func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int, types []string) ([]domain.SuggestPlace, error) {
+func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, location string, radius int, limit int, offset int, types []string, reactions []string) ([]domain.SuggestPlace, error) {
 	waitGroup := new(sync.WaitGroup)
 	result := []googleApi.Place{}
 
@@ -165,11 +165,21 @@ func (uc *UseCase) GetMergedNearbyPlaces(cfg *config.Config, user *domain.User, 
 		return nil, err
 	}
 
-	return uc.proceedPlaces(cfg, user, result), nil
+	return uc.proceedPlaces(cfg, user, result, reactions), nil
 }
 
-func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places []googleApi.Place) []domain.SuggestPlace {
+func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places []googleApi.Place, reactions []string) []domain.SuggestPlace {
 	//TODO: make it parallel
+
+	likeNeededFlag := false
+	visitedNeededFlag := false
+	if contains(reactions, domain.ReactionLike) {
+		likeNeededFlag = true
+	}
+	if contains(reactions, domain.ReactionVisited) {
+		visitedNeededFlag = true
+	}
+
 	proceeded := []domain.SuggestPlace{}
 	for _, place := range places {
 		if isPlaceRight(place) {
@@ -191,7 +201,10 @@ func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places [
 						proceededPlace.Reaction = reactions
 					}
 				}
-				proceeded = append(proceeded, proceededPlace)
+				if (contains(proceededPlace.Reaction, domain.ReactionLike) && likeNeededFlag) ||
+					(contains(proceededPlace.Reaction, domain.ReactionVisited) && visitedNeededFlag) || (len(reactions) == 0) {
+					proceeded = append(proceeded, proceededPlace)
+				}
 			}
 		}
 	}
@@ -215,4 +228,13 @@ func (uc *UseCase) UniqPlaces(places []domain.SuggestPlace) []domain.SuggestPlac
 		}
 	}
 	return list
+}
+
+func contains(a []string, s string) bool {
+	for i := 0; i < len(a); i++ {
+		if a[i] == s {
+			return true
+		}
+	}
+	return false
 }

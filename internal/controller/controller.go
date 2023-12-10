@@ -138,7 +138,20 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 		}
 	}
 
-	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset, types)
+	reactions := []string{}
+	if c.QueryParams().Has("reactions") {
+		reactionsStr := c.QueryParam("reactions")
+		reactionsSlice := strings.Split(reactionsStr, ",")
+		reactionsMap := domain.GetFilterReactionsMap()
+		for _, v := range reactionsSlice {
+			_, ok := reactionsMap[v]
+			if ok {
+				reactions = append(reactions, v)
+			}
+		}
+	}
+
+	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset, types, reactions)
 
 	places = pc.Usecase.UniqPlaces(places)
 
