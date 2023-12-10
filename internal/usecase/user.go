@@ -83,7 +83,12 @@ func (uc *UseCase) ApplyOnboardingReactions(userId string, types []string) error
 		return err
 	}
 
-	// TODO: processing user favourite categories
+	for i := 0; i < len(types); i++ {
+		_, ok := u.PlaceTypePreferences[types[i]]
+		if ok {
+			u.PlaceTypePreferences[types[i]] = 2
+		}
+	}
 
 	err = uc.repo.UpdateUser(u) // saving new ratings
 	return err
