@@ -126,15 +126,17 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	types := []string{}
 	if c.QueryParams().Has("types") {
 		typesStr := c.QueryParam("types")
-		typesSlice := strings.Split(typesStr, ",")
-		cats := categories.GetReversedCategoryMap()
-		for _, v := range typesSlice {
-			placeType, ok := cats[v]
-			if !ok {
-				log.Errorf("Bad category: %s", v)
-				return echo.ErrBadRequest
+		if typesStr != "" {
+			typesSlice := strings.Split(typesStr, ",")
+			cats := categories.GetReversedCategoryMap()
+			for _, v := range typesSlice {
+				placeType, ok := cats[v]
+				if !ok {
+					log.Errorf("Bad category: %s", v)
+					return echo.ErrBadRequest
+				}
+				types = append(types, placeType)
 			}
-			types = append(types, placeType)
 		}
 	}
 
