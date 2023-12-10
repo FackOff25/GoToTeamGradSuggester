@@ -15,6 +15,9 @@ const (
 	ReactionUnlike    = "unlike"
 	ReactionUnvisited = "unvisited"
 	ReactionUnrefuse  = "unrefuse"
+
+	CategoryLikeRus      = "Избранное"
+	CategoryUnvisitedRus = "Не посещенное"
 )
 
 type GetCategoriesResponse struct {
@@ -57,7 +60,7 @@ type SuggestPlace struct {
 
 func GetFilterReactionsMap() map[string]string {
 	return map[string]string{
-		"Избранное": ReactionLike,
-		"Не посещенное": ReactionUnvisited,
+		CategoryLikeRus:      ReactionLike,
+		CategoryUnvisitedRus: ReactionUnvisited,
 	}
 }
