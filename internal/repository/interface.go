@@ -15,4 +15,5 @@ type QueriesInterface interface {
 	SaveUserReaction(userId, placeUuid, reaction string) error // insert/update in users_places table [interconnection]
 	GetPlaceUuid(gID string) (string, error)
 	GetUserReaction(userId string, placeId string) (bool, bool, error)
+	UpdateUser(user *domain.User) error
 }
