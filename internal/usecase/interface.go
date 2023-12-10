@@ -16,4 +16,5 @@ type UsecaseInterface interface {
 	UniqPlaces(places []domain.SuggestPlace) []domain.SuggestPlace
 	GetRoute(req *domain.GrouteResp, travelMode string) (*domain.Route, error)
 	PrepareGreq(req *domain.RouteReq) (*domain.GrouteRequest, error)
+	ApplyOnboardingReactions(userId string, types []string) error
 }

@@ -14,3 +14,7 @@ type NewReactionRequest struct {
 	PlaceId  string `json:"place_id"`
 	Reaction string `json:"reaction"`
 }
+
+type OnboardingReactions struct {
+	Primary []string `json:"primary"`
+}
