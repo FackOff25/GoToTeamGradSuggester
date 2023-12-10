@@ -172,12 +172,12 @@ func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places [
 	//TODO: make it parallel
 
 	likeNeededFlag := false
-	visitedNeededFlag := false
+	unvisitedNeededFlag := false
 	if contains(reactions, domain.ReactionLike) {
 		likeNeededFlag = true
 	}
-	if contains(reactions, domain.ReactionVisited) {
-		visitedNeededFlag = true
+	if contains(reactions, domain.ReactionUnvisited) {
+		unvisitedNeededFlag = true
 	}
 
 	proceeded := []domain.SuggestPlace{}
@@ -202,7 +202,7 @@ func (uc *UseCase) proceedPlaces(cfg *config.Config, user *domain.User, places [
 					}
 				}
 				if (contains(proceededPlace.Reaction, domain.ReactionLike) && likeNeededFlag) ||
-					(contains(proceededPlace.Reaction, domain.ReactionVisited) && visitedNeededFlag) || (len(reactions) == 0) {
+					(!contains(proceededPlace.Reaction, domain.ReactionVisited) && unvisitedNeededFlag) || (len(reactions) == 0) {
 					proceeded = append(proceeded, proceededPlace)
 				}
 			}

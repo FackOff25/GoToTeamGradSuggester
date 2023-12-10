@@ -55,12 +55,9 @@ type SuggestPlace struct {
 	SortValue   float32     `json:"-"`
 }
 
-type DummyStruct struct {}
-
-func GetFilterReactionsMap() map[string]DummyStruct {
-	var ds DummyStruct
-	return map[string]DummyStruct{
-		ReactionLike: ds,
-		ReactionVisited: ds,
+func GetFilterReactionsMap() map[string]string {
+	return map[string]string{
+		"Избранное": ReactionLike,
+		"Не посещенное": ReactionUnvisited,
 	}
 }

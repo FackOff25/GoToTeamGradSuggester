@@ -124,29 +124,25 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	}
 
 	types := []string{}
+	reactions := []string{}
+
 	if c.QueryParams().Has("types") {
 		typesStr := c.QueryParam("types")
-		typesSlice := strings.Split(typesStr, ",")
-		cats := categories.GetReversedCategoryMap()
-		for _, v := range typesSlice {
-			placeType, ok := cats[v]
-			if !ok {
-				log.Errorf("Bad category: %s", v)
-				return echo.ErrBadRequest
-			}
-			types = append(types, placeType)
-		}
-	}
-
-	reactions := []string{}
-	if c.QueryParams().Has("reactions") {
-		reactionsStr := c.QueryParam("reactions")
-		reactionsSlice := strings.Split(reactionsStr, ",")
-		reactionsMap := domain.GetFilterReactionsMap()
-		for _, v := range reactionsSlice {
-			_, ok := reactionsMap[v]
-			if ok {
-				reactions = append(reactions, v)
+		if typesStr != "" {
+			typesSlice := strings.Split(typesStr, ",")
+			cats := categories.GetReversedCategoryMap()
+			reactionsMap := domain.GetFilterReactionsMap()
+			for _, v := range typesSlice {
+				reaction, inReactionsMap := reactionsMap[v]
+				placeType, ok := cats[v]
+				if ok {
+					types = append(types, placeType)
+				} else if inReactionsMap {
+					reactions = append(reactions, reaction)
+				} else {
+					log.Errorf("Bad category: %s", v)
+					return echo.ErrBadRequest
+				}
 			}
 		}
 	}
