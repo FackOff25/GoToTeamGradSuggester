@@ -124,21 +124,30 @@ func (pc *Controller) CreatePlacesListHandler(c echo.Context) error {
 	}
 
 	types := []string{}
+	reactions := []string{}
+
 	if c.QueryParams().Has("types") {
 		typesStr := c.QueryParam("types")
-		typesSlice := strings.Split(typesStr, ",")
-		cats := categories.GetReversedCategoryMap()
-		for _, v := range typesSlice {
-			placeType, ok := cats[v]
-			if !ok {
-				log.Errorf("Bad category: %s", v)
-				return echo.ErrBadRequest
+		if typesStr != "" {
+			typesSlice := strings.Split(typesStr, ",")
+			cats := categories.GetReversedCategoryMap()
+			reactionsMap := domain.GetFilterReactionsMap()
+			for _, v := range typesSlice {
+				reaction, inReactionsMap := reactionsMap[v]
+				placeType, ok := cats[v]
+				if ok {
+					types = append(types, placeType)
+				} else if inReactionsMap {
+					reactions = append(reactions, reaction)
+				} else {
+					log.Errorf("Bad category: %s", v)
+					return echo.ErrBadRequest
+				}
 			}
-			types = append(types, placeType)
 		}
 	}
 
-	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset, types)
+	places, _ := pc.Usecase.GetMergedNearbyPlaces(pc.Cfg, user, location, radius, limit, offset, types, reactions)
 
 	places = pc.Usecase.UniqPlaces(places)
 
