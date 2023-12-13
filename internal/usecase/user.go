@@ -77,6 +77,23 @@ func (uc *UseCase) SaveUserReaction(userUuid, placeId, reaction string) error {
 	return err
 }
 
+func (uc *UseCase) ApplyOnboardingReactions(userId string, types []string) error {
+	u, err := uc.repo.GetUser(userId) // current user's ratings
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(types); i++ {
+		_, ok := u.PlaceTypePreferences[types[i]]
+		if ok {
+			u.PlaceTypePreferences[types[i]] = 2
+		}
+	}
+
+	err = uc.repo.UpdateUser(u) // saving new ratings
+	return err
+}
+
 //
 // TEMPORARY
 //

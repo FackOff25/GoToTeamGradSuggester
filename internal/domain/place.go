@@ -15,6 +15,9 @@ const (
 	ReactionUnlike    = "unlike"
 	ReactionUnvisited = "unvisited"
 	ReactionUnrefuse  = "unrefuse"
+
+	CategoryLikeRus      = "Избранное"
+	CategoryUnvisitedRus = "Не посещенное"
 )
 
 type GetCategoriesResponse struct {
@@ -53,4 +56,11 @@ type SuggestPlace struct {
 	RatingCount int         `json:"rating_count,omitempty"`
 	Reaction    []string    `json:"reactions,omitempty"`
 	SortValue   float32     `json:"-"`
+}
+
+func GetFilterReactionsMap() map[string]string {
+	return map[string]string{
+		CategoryLikeRus:      ReactionLike,
+		CategoryUnvisitedRus: ReactionUnvisited,
+	}
 }
