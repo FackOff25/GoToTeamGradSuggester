@@ -29,7 +29,7 @@ categories:
 #  - shopping_mall
   - stadium
   - synagogue
-  - tourist_attraction
+#  - tourist_attraction
   - hindu_temple
   - zoo
 db:
