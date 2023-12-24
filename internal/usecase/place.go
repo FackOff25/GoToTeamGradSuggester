@@ -6,6 +6,6 @@ const ratingWeight = 2
 
 func getPlaceTypesWeight() map[string]float32 {
 	return map[string]float32{
-		domain.TypePlacePark: 2.5,
+		domain.TypePlacePark: 1.0,
 	}
 }
