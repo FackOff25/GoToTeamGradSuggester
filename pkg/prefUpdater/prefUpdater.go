@@ -3,9 +3,9 @@ package prefupdater
 const (
 	MaxPreferenceValue = 20
 	MinPreferenceValue = 0.1
-	LikeUpdateValue    = 0.4
+	LikeUpdateValue    = 0.2
 	VisitedUpdateValue = 0.1
-	RefuseUpdateValue  = 0.3
+	RefuseUpdateValue  = 0.1
 )
 
 func DefaultUpdateFunc(preference float32) float32 {
