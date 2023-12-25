@@ -72,8 +72,6 @@ func (q *Queries) UpdateUserPreferences(uuid string, placeId string, reaction st
 		return err
 	}
 
-	var multiplier float32
-
 	var ReactionFunc func(pref float32) float32
 
 	switch reaction {
@@ -95,9 +93,7 @@ func (q *Queries) UpdateUserPreferences(uuid string, placeId string, reaction st
 
 	for _, v := range types {
 		_, ok := u.PlaceTypePreferences[v]
-		if ok {
-			u.PlaceTypePreferences[v] *= multiplier
-		} else {
+		if !ok {
 			u.PlaceTypePreferences[v] = 1
 		}
 	}
